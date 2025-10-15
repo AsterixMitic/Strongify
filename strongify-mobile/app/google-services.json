@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "547050806111",
+    "project_id": "strongify-2e0c0",
+    "storage_bucket": "strongify-2e0c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547050806111:android:83feb082f36351cf2574ea",
+        "android_client_info": {
+          "package_name": "com.example.strongify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKu1hRW3ZopWi-4RzmnXpDj_WKBdxXSwE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
