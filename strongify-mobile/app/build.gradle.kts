@@ -3,6 +3,13 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1"
+}
+
+buildscript {
+    dependencies {
+        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+    }
 }
 
 android {
@@ -75,5 +82,12 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
 
     implementation("androidx.navigation:navigation-compose:2.9.5")
+
+    //Google maps
+    implementation("com.google.maps.android:maps-compose:6.12.1")
+    implementation("com.google.android.gms:play-services-maps:19.2.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+
 
 }
