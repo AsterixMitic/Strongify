@@ -36,6 +36,7 @@ class AuthRepository {
             val user = User(
                 userId = userId,
                 username = username,
+                email = email,
                 name = name,
                 lastName = lastName,
                 phone = phone,
@@ -61,4 +62,28 @@ class AuthRepository {
     }
 
     fun getCurrentUserId(): String? = auth.currentUser?.uid
+
+    suspend fun getCurrentUserData(): User? {
+        val userId = auth.currentUser?.uid ?: return null
+        val snapshot = db.collection("users").document(userId).get().await()
+        return snapshot.toObject(User::class.java)
+    }
+
+    suspend fun updateProfileImage(imageBytes: ByteArray): Result<String> {
+        return try {
+            val userId = auth.currentUser?.uid ?: return Result.failure(Exception("No user logged in"))
+            val ref = storage.child("profile_images/${UUID.randomUUID()}.jpg")
+            ref.putBytes(imageBytes).await()
+            val imageUrl = ref.downloadUrl.await().toString()
+
+            db.collection("users").document(userId).update("profileImageUrl", imageUrl).await()
+            Result.success(imageUrl)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun logout() {
+        auth.signOut()
+    }
 }

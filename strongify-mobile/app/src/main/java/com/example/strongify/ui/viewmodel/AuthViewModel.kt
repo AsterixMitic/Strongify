@@ -3,6 +3,7 @@ package com.example.strongify.ui.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.strongify.data.model.User
 import com.example.strongify.data.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,14 +101,41 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
         _validationError.value = error
         return error == null
     }
-
     private fun validateLogin(email: String, password: String): String? {
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) return "Nevažeći email"
         if (password.isBlank()) return "Lozinka ne sme biti prazna"
         return null
     }
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
+    fun loadUser() {
+        viewModelScope.launch {
+            val user = repo.getCurrentUserData()
+            _user.value = user
+        }
+    }
+
+    fun updateProfileImage(imageBytes: ByteArray) {
+        viewModelScope.launch {
+            _authState.value = AuthResult.Loading
+            val result = repo.updateProfileImage(imageBytes)
+            result.onSuccess { newUrl ->
+                _user.value = _user.value?.copy(profileImageUrl = newUrl)
+                _authState.value = AuthResult.Success
+            }.onFailure { e ->
+                _authState.value = AuthResult.Error(e.message ?: "Greška pri ažuriranju slike")
+            }
+        }
+    }
+    fun logout() {
+        repo.logout()
+        _user.value = null
+        _authState.value = null
+    }
 
     fun isUserLoggedIn(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
     }
+
 }
