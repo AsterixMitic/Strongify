@@ -1,5 +1,6 @@
 package com.example.strongify.ui
 
+import ProfileViewModel
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
@@ -31,6 +32,7 @@ sealed class MainRoute(val route: String) {
 fun MainScreen(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
+    profileViewModel: ProfileViewModel,
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -68,7 +70,7 @@ fun MainScreen(
                 HomeScreen(viewModel = homeViewModel)
             }
             composable(MainRoute.Profile.route) {
-                ProfileScreen(viewModel = authViewModel, onLogout = onLogout)
+                ProfileScreen(viewModel = authViewModel, profileViewModel = profileViewModel, onLogout = onLogout)
             }
             composable(MainRoute.Leaderboard.route) {
                 LeaderboardScreen()

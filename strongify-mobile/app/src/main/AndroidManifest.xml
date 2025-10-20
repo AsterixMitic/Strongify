@@ -29,6 +29,14 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
 
+        <meta-data
+            android:name="com.example.strongify.cloudinary.CLOUDINARY_CLOUD_NAME"
+            android:value="${CLOUDINARY_CLOUD_NAME}" />
+
+        <meta-data
+            android:name="com.example.strongify.cloudinary.CLOUDINARY_PROFILE_PRESET"
+            android:value="${CLOUDINARY_PROFILE_PRESET}" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

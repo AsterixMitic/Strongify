@@ -1,5 +1,6 @@
 package com.example.strongify
 
+import ProfileViewModel
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,6 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val authViewModel = AuthViewModel()
             val homeViewModel = HomeViewModel()
+            val profileViewModel = ProfileViewModel()
 
             val startDestination = if (authViewModel.isUserLoggedIn()) {
                 authViewModel.loadUser()
@@ -26,6 +28,7 @@ class MainActivity : ComponentActivity() {
             StrongifyNavGraph(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
+                profileViewModel = profileViewModel,
                 startDestination = startDestination
             )
         }

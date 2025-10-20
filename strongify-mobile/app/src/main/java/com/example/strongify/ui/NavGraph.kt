@@ -1,5 +1,6 @@
 package com.example.strongify.ui
 
+import ProfileViewModel
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,6 +21,7 @@ sealed class Screen(val route: String) {
 fun StrongifyNavGraph(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
+    profileViewModel: ProfileViewModel,
     startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
@@ -60,6 +62,7 @@ fun StrongifyNavGraph(
             MainScreen(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
+                profileViewModel = profileViewModel,
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Main.route) { inclusive = true }

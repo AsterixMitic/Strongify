@@ -112,6 +112,7 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
     fun loadUser() {
         viewModelScope.launch {
             val user = repo.getCurrentUserData()
+
             _user.value = user
         }
     }

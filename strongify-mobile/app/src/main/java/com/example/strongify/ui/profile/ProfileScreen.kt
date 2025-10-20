@@ -1,10 +1,13 @@
 package com.example.strongify.ui.profile
 
+import ProfileViewModel
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,50 +19,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.strongify.ui.viewmodel.AuthViewModel
-import java.io.InputStream
 
 @Composable
-fun ProfileScreen(viewModel: AuthViewModel = viewModel(), onLogout: () -> Unit) {
+fun ProfileScreen(viewModel: AuthViewModel, profileViewModel: ProfileViewModel, onLogout: () -> Unit) {
     val user by viewModel.user.collectAsState()
     val context = LocalContext.current
 
-    var selectedImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    val uploadState by profileViewModel.uploadState.collectAsState()
 
-    val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri ->
-            uri?.let {
-                val inputStream: InputStream? = context.contentResolver.openInputStream(it)
-                val bytes = inputStream?.readBytes()
-                if (bytes != null) selectedImageBytes = bytes
-            }
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            profileViewModel.uploadProfileImage(it, context, user!!.userId)
         }
-    )
-
-    LaunchedEffect(Unit) { viewModel.loadUser() }
-
-    selectedImageBytes?.let { bytes ->
-        viewModel.updateProfileImage(bytes)
-        selectedImageBytes = null
     }
 
     user?.let { currentUser ->
@@ -70,19 +57,52 @@ fun ProfileScreen(viewModel: AuthViewModel = viewModel(), onLogout: () -> Unit) 
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            AsyncImage(
-                model = user?.profileImageUrl ?: "",
-                contentDescription = "Profilna slika",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentScale = ContentScale.Crop,
-            )
 
-            TextButton(onClick = { imagePicker.launch("image/*") }) {
-                Text("Promeni sliku")
+            val img = user?.profileImageUrl
+
+            when (uploadState) {
+                is ProfileViewModel.UploadState.Loading -> CircularProgressIndicator()
+                is ProfileViewModel.UploadState.Success -> {
+                    val imageUrl = (uploadState as ProfileViewModel.UploadState.Success).url
+                    Image(
+                        painter = rememberAsyncImagePainter(imageUrl),
+                        contentDescription = "Profilna slika",
+                        modifier = Modifier
+                            .size(128.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, Color.Gray, CircleShape)
+                            .clickable { galleryLauncher.launch("image/*") }
+                    )
+                }
+                is ProfileViewModel.UploadState.Error -> {
+                    Text((uploadState as ProfileViewModel.UploadState.Error).message)
+                }
+                else -> {
+                    if(img != ""){
+                        AsyncImage(
+                            model = user?.profileImageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.size(120.dp).clip(CircleShape)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(128.dp)
+                                .clip(CircleShape)
+                                .background(Color.LightGray)
+                                .clickable { galleryLauncher.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Dodaj sliku", color = Color.DarkGray)
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            TextButton(onClick = { galleryLauncher.launch("image/*") }) {
+                Text("Promeni sliku profila")
             }
 
             Text("Ime: ${currentUser.name}")

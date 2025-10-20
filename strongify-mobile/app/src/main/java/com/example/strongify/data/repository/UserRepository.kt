@@ -35,4 +35,9 @@ class UserRepository {
     fun signOut() {
         auth.signOut()
     }
+
+    suspend fun updateUserProfileImage(userId: String, imageUrl: String) {
+        val userRef = usersCollection.document(userId)
+        userRef.update("profileImageUrl", imageUrl)
+    }
 }
