@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import com.example.strongify.ui.StrongifyNavGraph
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
+import com.example.strongify.ui.viewmodel.LeaderboardViewModel
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
             val authViewModel = AuthViewModel()
             val homeViewModel = HomeViewModel()
             val profileViewModel = ProfileViewModel()
+            val leaderboardViewModel = LeaderboardViewModel()
 
             val startDestination = if (authViewModel.isUserLoggedIn()) {
                 authViewModel.loadUser()
@@ -29,6 +31,7 @@ class MainActivity : ComponentActivity() {
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 profileViewModel = profileViewModel,
+                leaderboardViewModel = leaderboardViewModel,
                 startDestination = startDestination
             )
         }

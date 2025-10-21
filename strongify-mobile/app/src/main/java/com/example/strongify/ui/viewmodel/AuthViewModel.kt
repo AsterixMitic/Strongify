@@ -33,7 +33,6 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
         name: String,
         lastName: String,
         phone: String,
-        imageBytes: ByteArray?
     ) {
         val error = validateRegistration(email, password, username, name, lastName, phone)
         if (error != null) {
@@ -43,8 +42,12 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
 
         viewModelScope.launch {
             _authState.value = AuthResult.Loading
-            val result = repo.registerUser(email, password, username, name, lastName, phone, imageBytes)
+            val result = repo.registerUser(email, password, username, name, lastName, phone)
             _authState.value = result.exceptionOrNull()?.let { AuthResult.Error(it.message ?: "Greška") } ?: AuthResult.Success
+            if(_authState.value == AuthResult.Success){
+                val user = repo.getCurrentUserData()
+                _user.value = user
+            }
         }
     }
 
@@ -60,6 +63,10 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
             _authState.value = AuthResult.Loading
             val result = repo.loginUser(email, password)
             _authState.value = result.exceptionOrNull()?.let { AuthResult.Error(it.message ?: "Greška") } ?: AuthResult.Success
+            if(_authState.value == AuthResult.Success){
+                val user = repo.getCurrentUserData()
+                _user.value = user
+            }
         }
     }
     fun validateRegistrationFields(
@@ -117,18 +124,6 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
         }
     }
 
-    fun updateProfileImage(imageBytes: ByteArray) {
-        viewModelScope.launch {
-            _authState.value = AuthResult.Loading
-            val result = repo.updateProfileImage(imageBytes)
-            result.onSuccess { newUrl ->
-                _user.value = _user.value?.copy(profileImageUrl = newUrl)
-                _authState.value = AuthResult.Success
-            }.onFailure { e ->
-                _authState.value = AuthResult.Error(e.message ?: "Greška pri ažuriranju slike")
-            }
-        }
-    }
     fun logout() {
         repo.logout()
         _user.value = null

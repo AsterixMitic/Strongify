@@ -151,7 +151,7 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                viewModel.register(email, password, username, name, lastName, phone, null)
+                viewModel.register(email, password, username, name, lastName, phone)
             },
             enabled = allFieldsValid && authState != AuthResult.Loading
         ) {

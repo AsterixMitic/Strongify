@@ -21,6 +21,7 @@ import com.example.strongify.ui.leaderboard.LeaderboardScreen
 import com.example.strongify.ui.profile.ProfileScreen
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
+import com.example.strongify.ui.viewmodel.LeaderboardViewModel
 
 sealed class MainRoute(val route: String) {
     object Home : MainRoute("home")
@@ -33,6 +34,7 @@ fun MainScreen(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
+    leaderboardViewModel: LeaderboardViewModel,
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -73,7 +75,7 @@ fun MainScreen(
                 ProfileScreen(viewModel = authViewModel, profileViewModel = profileViewModel, onLogout = onLogout)
             }
             composable(MainRoute.Leaderboard.route) {
-                LeaderboardScreen()
+                LeaderboardScreen(viewModel = leaderboardViewModel)
             }
         }
     }

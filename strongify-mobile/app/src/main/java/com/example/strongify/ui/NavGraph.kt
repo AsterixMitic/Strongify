@@ -10,6 +10,7 @@ import com.example.strongify.ui.login.LoginScreen
 import com.example.strongify.ui.register.RegisterScreen
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
+import com.example.strongify.ui.viewmodel.LeaderboardViewModel
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -22,6 +23,7 @@ fun StrongifyNavGraph(
     authViewModel: AuthViewModel,
     homeViewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
+    leaderboardViewModel: LeaderboardViewModel,
     startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
@@ -63,6 +65,7 @@ fun StrongifyNavGraph(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 profileViewModel = profileViewModel,
+                leaderboardViewModel = leaderboardViewModel,
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Main.route) { inclusive = true }
