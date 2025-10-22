@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -41,7 +42,11 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
+
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate(MainRoute.Home.route) },
