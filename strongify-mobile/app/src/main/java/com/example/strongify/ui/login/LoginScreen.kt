@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,7 +51,7 @@ fun LoginScreen(
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
+    val context = LocalContext.current
     var passwordVisible by remember { mutableStateOf(false) }
 
     val allFieldsValid = viewModel.validateLoginFields(email, password)
@@ -102,7 +103,7 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                viewModel.login(email, password)
+                viewModel.login(email, password, context)
             },
             enabled = allFieldsValid && authState != AuthResult.Loading
         ) {

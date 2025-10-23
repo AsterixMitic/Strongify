@@ -2,6 +2,9 @@ package com.example.strongify
 
 import ProfileViewModel
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +18,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
         setContent {
             StrongifyTheme {
                 val authViewModel = AuthViewModel()
@@ -24,6 +28,7 @@ class MainActivity : ComponentActivity() {
 
                 val startDestination = if (authViewModel.isUserLoggedIn()) {
                     authViewModel.loadUser()
+                    authViewModel.startNearbyService(this)
                     "main"
                 } else {
                     "login"
@@ -39,4 +44,20 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "strongify_channel",
+                "Strongify Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications about nearby users or events"
+            }
+
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
 }

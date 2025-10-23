@@ -9,5 +9,5 @@ data class GymRecord(
     val longitude: Double = 0.0,
     val timestamp: Long = System.currentTimeMillis(),
     val score: Int = 0,
-    val exerciseType: String = ""
+    val exerciseType: String = "",
 )

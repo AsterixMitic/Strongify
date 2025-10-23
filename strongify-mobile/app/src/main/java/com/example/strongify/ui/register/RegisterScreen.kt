@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -58,7 +59,7 @@ fun RegisterScreen(
     var lastName by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     val allFieldsValid = viewModel.validateRegistrationFields(
@@ -151,7 +152,7 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                viewModel.register(email, password, username, name, lastName, phone)
+                viewModel.register(email, password, username, name, lastName, phone, context)
             },
             enabled = allFieldsValid && authState != AuthResult.Loading
         ) {

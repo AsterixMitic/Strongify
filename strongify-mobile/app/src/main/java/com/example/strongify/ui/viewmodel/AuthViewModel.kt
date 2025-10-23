@@ -1,10 +1,14 @@
 package com.example.strongify.ui.viewmodel
 
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.strongify.data.model.User
 import com.example.strongify.data.repository.AuthRepository
+import com.example.strongify.notifications.NearbyService
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +37,7 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
         name: String,
         lastName: String,
         phone: String,
+        context: Context
     ) {
         val error = validateRegistration(email, password, username, name, lastName, phone)
         if (error != null) {
@@ -46,12 +51,13 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
             _authState.value = result.exceptionOrNull()?.let { AuthResult.Error(it.message ?: "Greška") } ?: AuthResult.Success
             if(_authState.value == AuthResult.Success){
                 val user = repo.getCurrentUserData()
+                startNearbyService(context)
                 _user.value = user
             }
         }
     }
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, context: Context) {
 
         val error = validateLogin(email, password)
         if (error != null) {
@@ -65,6 +71,7 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
             _authState.value = result.exceptionOrNull()?.let { AuthResult.Error(it.message ?: "Greška") } ?: AuthResult.Success
             if(_authState.value == AuthResult.Success){
                 val user = repo.getCurrentUserData()
+                startNearbyService(context)
                 _user.value = user
             }
         }
@@ -128,6 +135,20 @@ class AuthViewModel(private val repo: AuthRepository = AuthRepository()) : ViewM
         repo.logout()
         _user.value = null
         _authState.value = null
+    }
+
+    fun startNearbyService(context: Context) {
+        val serviceIntent = Intent(context, NearbyService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent)
+        } else {
+            context.startService(serviceIntent)
+        }
+    }
+
+    fun stopNearbyService(context: Context) {
+        val serviceIntent = Intent(context, NearbyService::class.java)
+        context.stopService(serviceIntent)
     }
 
     fun isUserLoggedIn(): Boolean {

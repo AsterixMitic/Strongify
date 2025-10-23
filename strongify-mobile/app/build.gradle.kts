@@ -82,6 +82,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-messaging")
+
+    implementation("com.firebase:geofire-android-common:3.2.0")
 
     implementation("androidx.navigation:navigation-compose:2.9.5")
 

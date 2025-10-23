@@ -37,6 +37,7 @@ fun StrongifyNavGraph(
                 viewModel = authViewModel,
                 onLoginSuccess = {
                     navController.navigate(Screen.Main.route) {
+
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 },

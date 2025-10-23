@@ -7,5 +7,9 @@ data class User(
     val lastName: String = "",
     val phone: String = "",
     val profileImageUrl: String = "",
-    val totalPoints: Int = 0
+    val totalPoints: Int = 0,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val fcmToken: String = ""
 )
+

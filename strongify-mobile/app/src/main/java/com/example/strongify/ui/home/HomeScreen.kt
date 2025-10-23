@@ -52,6 +52,8 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
@@ -65,7 +67,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(viewModel: HomeViewModel) {
     val context = LocalContext.current
     val records by viewModel.records.collectAsState()
-
+    val currentUserId: String? = Firebase.auth.currentUser?.uid
     var currentLatLng by rememberSaveable { mutableStateOf(LatLng(43.32472, 21.90333)) }
 
     var hasPermission by remember {
@@ -160,6 +162,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                             description = desc,
                             latitude = currentLatLng.latitude,
                             longitude = currentLatLng.longitude,
+                            userId = currentUserId!!,
                             exerciseType = type
                         )
                         viewModel.addRecord(record)
