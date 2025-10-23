@@ -15,10 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -59,8 +56,6 @@ fun AddRecordDialog(
     var distance by remember { mutableStateOf("") }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
-
-    val exerciseTypes = listOf("Powerlifting", "Calisthenics", "Bodybuilding", "Cardio")
 
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         imageUri = uri
@@ -107,7 +102,7 @@ fun AddRecordDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                DropdownMenuBox(selectedType, exerciseTypes) { selectedType = it }
+                DropdownMenuBox(selectedType, ) { selectedType = it }
 
                 when (selectedType) {
                     "Powerlifting", "Bodybuilding" -> {
@@ -208,26 +203,3 @@ fun AddRecordDialog(
         }
     )
 }
-
-@Composable fun DropdownMenuBox(selectedType: String, types: List<String>, onSelect: (String) -> Unit)
-{ var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox( expanded = expanded, onExpandedChange = { expanded = !expanded } )
-    {
-        OutlinedTextField(
-            value = selectedType,
-            onValueChange = {},
-            label = { Text("Tip vežbe")
-        }, readOnly = true, modifier = Modifier.menuAnchor() )
-        DropdownMenu(
-            containerColor = MaterialTheme.colorScheme.surface,
-            expanded = expanded,
-            onDismissRequest = { expanded = false } )
-        { types.forEach {
-            DropdownMenuItem(
-                text = { Text(it) },
-                onClick = {
-                    onSelect(it)
-                    expanded = false
-                })
-        } } } }
-

@@ -14,3 +14,5 @@ val StrongBackground = Color(0xFF121212)
 val StrongSurface = Color(0xFF1E1E1E)
 val StrongTextPrimary = Color(0xFFFFFFFF)
 val StrongTextSecondary = Color(0xFFB0B0B0)
+
+val Green = Color(0xFF00FF00)

@@ -1,5 +1,6 @@
 package com.example.strongify.ui.theme
 
+import android.graphics.Color.green
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -35,7 +36,6 @@ fun StrongifyTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) DarkColorScheme else LightColorScheme
-
     MaterialTheme(
         colorScheme = colors,
         typography = StrongifyTypography,

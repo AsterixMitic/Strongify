@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Firebase
@@ -60,6 +62,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
     val records by viewModel.records.collectAsState()
     val currentUserId: String? = Firebase.auth.currentUser?.uid
     var currentLatLng by rememberSaveable { mutableStateOf(LatLng(43.32472, 21.90333)) }
+
+    var showFilterDialog by remember { mutableStateOf(false) }
 
     var hasPermission by remember {
         mutableStateOf(
@@ -127,9 +131,35 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     Marker(
                         state = MarkerState(LatLng(record.latitude, record.longitude)),
                         title = record.title,
-                        snippet = "${record.exerciseType}: ${record.description}"
+                        snippet = "${record.exerciseType}",
+                        icon = BitmapDescriptorFactory.defaultMarker(getMarkerColor(record.exerciseType))
                     )
                 }
+            }
+
+            FloatingActionButton(
+                onClick = { showFilterDialog = true },
+                containerColor = if (!showFilterDialog) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp, 100.dp),
+            ) {
+                Icon(Icons.Default.Search, contentDescription = "Filtriraj")
+            }
+
+            if (showFilterDialog) {
+                RecordFilterDialog(
+                    userLocation = currentLatLng,
+                    onDismiss = { showFilterDialog = false },
+                    onApplyFilter = { radius, type ->
+                        viewModel.filterRecords(radius, type, currentLatLng)
+                        showFilterDialog = false
+                    },
+                    onResetFilters = {
+                        viewModel.resetFilters()
+                        showFilterDialog = false
+                    }
+                )
             }
 
             FloatingActionButton(
@@ -172,3 +202,15 @@ fun HomeScreen(viewModel: HomeViewModel) {
         }
     }
 }
+
+//TODO: Custom markeri za svaki tip posebno
+fun getMarkerColor(exerciseType: String): Float {
+    return when (exerciseType.lowercase()) {
+        "powerlifting" -> BitmapDescriptorFactory.HUE_RED
+        "bodybuilding" -> BitmapDescriptorFactory.HUE_ORANGE
+        "calisthenics" -> BitmapDescriptorFactory.HUE_AZURE
+        "cardio" -> BitmapDescriptorFactory.HUE_GREEN
+        else -> BitmapDescriptorFactory.HUE_VIOLET
+    }
+}
+

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.strongify.data.model.GymRecord
 import com.example.strongify.data.repository.CloudinaryStorageRepository
 import com.example.strongify.data.repository.GymRepository
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -89,6 +90,40 @@ class HomeViewModel(
             } catch (e: Exception) {
                 _uploadState.value = UploadState.Error(e.message ?: "Greška prilikom slanja slike")
             }
+        }
+    }
+
+    fun filterRecords(radius: Int?, exerciseType: String?, userLocation: LatLng?) {
+        val allRecords = _records.value
+
+        val filtered = allRecords.filter { record ->
+            var matches = true
+
+            if (exerciseType != null) {
+                matches = matches && record.exerciseType.equals(exerciseType, ignoreCase = true)
+            }
+
+            if (radius != null && userLocation != null) {
+                val distance = FloatArray(1)
+                android.location.Location.distanceBetween(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    record.latitude,
+                    record.longitude,
+                    distance
+                )
+                matches = matches && distance[0] <= radius
+            }
+
+            matches
+        }
+
+        _records.value = filtered
+    }
+
+    fun resetFilters() {
+        repo.getRecordsRealtime { updatedList ->
+            _records.value = updatedList
         }
     }
 
