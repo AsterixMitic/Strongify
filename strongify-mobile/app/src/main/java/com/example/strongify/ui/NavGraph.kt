@@ -11,6 +11,7 @@ import com.example.strongify.ui.register.RegisterScreen
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
 import com.example.strongify.ui.viewmodel.LeaderboardViewModel
+import com.example.strongify.ui.viewmodel.RecordsViewModel
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -24,6 +25,7 @@ fun StrongifyNavGraph(
     homeViewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
     leaderboardViewModel: LeaderboardViewModel,
+    recordsViewModel: RecordsViewModel,
     startDestination: String,
     navController: NavHostController = rememberNavController()
 ) {
@@ -66,6 +68,7 @@ fun StrongifyNavGraph(
                 authViewModel = authViewModel,
                 homeViewModel = homeViewModel,
                 profileViewModel = profileViewModel,
+                recordsViewModel = recordsViewModel,
                 leaderboardViewModel = leaderboardViewModel,
                 onLogout = {
                     navController.navigate(Screen.Login.route) {

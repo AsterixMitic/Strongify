@@ -13,6 +13,7 @@ import com.example.strongify.ui.theme.StrongifyTheme
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
 import com.example.strongify.ui.viewmodel.LeaderboardViewModel
+import com.example.strongify.ui.viewmodel.RecordsViewModel
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                 val homeViewModel = HomeViewModel()
                 val profileViewModel = ProfileViewModel()
                 val leaderboardViewModel = LeaderboardViewModel()
+                val recordsViewModel = RecordsViewModel()
 
                 val startDestination = if (authViewModel.isUserLoggedIn()) {
                     authViewModel.loadUser()
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
                     homeViewModel = homeViewModel,
                     profileViewModel = profileViewModel,
                     leaderboardViewModel = leaderboardViewModel,
+                    recordsViewModel = recordsViewModel,
                     startDestination = startDestination
                 )
             }

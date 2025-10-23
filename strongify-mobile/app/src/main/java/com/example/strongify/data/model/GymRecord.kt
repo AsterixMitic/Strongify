@@ -10,4 +10,8 @@ data class GymRecord(
     val timestamp: Long = System.currentTimeMillis(),
     val score: Int = 0,
     val exerciseType: String = "",
+    val imageUrl: String? = null,
+    val rpe: Int = 0,
+    val sets: Int = 0,
+    val reps: Int = 0
 )

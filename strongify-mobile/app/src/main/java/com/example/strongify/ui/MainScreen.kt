@@ -1,8 +1,10 @@
 package com.example.strongify.ui
 
 import ProfileViewModel
+import RecordsScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
@@ -23,11 +25,14 @@ import com.example.strongify.ui.profile.ProfileScreen
 import com.example.strongify.ui.viewmodel.AuthViewModel
 import com.example.strongify.ui.viewmodel.HomeViewModel
 import com.example.strongify.ui.viewmodel.LeaderboardViewModel
+import com.example.strongify.ui.viewmodel.RecordsViewModel
 
 sealed class MainRoute(val route: String) {
     object Home : MainRoute("home")
     object Profile : MainRoute("profile")
     object Leaderboard : MainRoute("leaderboard")
+
+    object Records : MainRoute("records")
 }
 
 @Composable
@@ -36,6 +41,7 @@ fun MainScreen(
     homeViewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
     leaderboardViewModel: LeaderboardViewModel,
+    recordsViewModel: RecordsViewModel,
     onLogout: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -61,6 +67,12 @@ fun MainScreen(
                 )
                 NavigationBarItem(
                     selected = false,
+                    onClick = { navController.navigate(MainRoute.Records.route) },
+                    label = { Text("Records") },
+                    icon = { Icon(Icons.AutoMirrored.Filled.FormatListBulleted, contentDescription = null) }
+                )
+                NavigationBarItem(
+                    selected = false,
                     onClick = { navController.navigate(MainRoute.Profile.route) },
                     label = { Text("Profil") },
                     icon = { Icon(Icons.Default.Person, contentDescription = null) }
@@ -81,6 +93,9 @@ fun MainScreen(
             }
             composable(MainRoute.Leaderboard.route) {
                 LeaderboardScreen(viewModel = leaderboardViewModel)
+            }
+            composable(MainRoute.Records.route) {
+                RecordsScreen(viewModel = recordsViewModel)
             }
         }
     }
