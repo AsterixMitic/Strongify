@@ -23,7 +23,7 @@ class CloudinaryStorageRepository(
     private suspend fun uploadImage(
         uri: Uri,
         cloudName: String,
-        uploadPreset: String?,
+        uploadPreset: String,
         context: Context
     ): String {
 

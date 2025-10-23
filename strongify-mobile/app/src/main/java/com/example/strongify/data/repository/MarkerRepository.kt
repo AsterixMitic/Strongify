@@ -9,7 +9,7 @@ import kotlinx.coroutines.tasks.await
 class MarkerRepository (){
 
     private val firestore = FirebaseFirestore.getInstance()
-    private val recordsCollection = firestore.collection("gymRecords")
+    private val recordsCollection = firestore.collection("gym_records")
 
     suspend fun getNearbyRecords(
         latitude: Double,
@@ -53,6 +53,13 @@ class MarkerRepository (){
             "timestamp" to record.timestamp,
             "score" to record.score,
             "exerciseType" to record.exerciseType,
+            "imageUrl" to record.imageUrl,
+            "rpe" to record.rpe,
+            "sets" to record.sets,
+            "reps" to record.reps,
+            "duration" to record.duration,
+            "weight" to record.weight,
+            "distance" to record.distance,
             "geoHash" to geoHash
         )
         recordsCollection.document(record.id).set(data).await()

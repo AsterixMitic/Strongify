@@ -11,7 +11,10 @@ data class GymRecord(
     val score: Int = 0,
     val exerciseType: String = "",
     val imageUrl: String? = null,
-    val rpe: Int = 0,
-    val sets: Int = 0,
-    val reps: Int = 0
+    val rpe: Int? = 0,
+    val sets: Int? = 0,
+    val reps: Int? = 0,
+    val duration: Int? = 0,
+    val weight: Double? = 0.0,
+    val distance: Double? = 0.0
 )

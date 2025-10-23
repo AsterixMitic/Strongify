@@ -9,25 +9,16 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -155,81 +146,28 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
             if (showDialog) {
                 AddRecordDialog(
+                    homeViewModel = viewModel,
+                    context = context,
                     onDismiss = { showDialog = false },
-                    onSave = { title, desc, type ->
+                    onSave = { title, description, type, rpe, sets, reps, duration, weight, distance, imageUri ->
                         val record = GymRecord(
                             title = title,
-                            description = desc,
+                            description = description,
+                            exerciseType = type,
+                            rpe = rpe,
+                            sets = sets,
+                            reps = reps,
+                            duration = duration,
+                            weight = weight,
+                            distance = distance,
                             latitude = currentLatLng.latitude,
                             longitude = currentLatLng.longitude,
                             userId = currentUserId!!,
-                            exerciseType = type
                         )
-                        viewModel.addRecord(record)
+                        viewModel.addRecord(record, imageUri, context)
                         showDialog = false
                     }
                 )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddRecordDialog(onDismiss: () -> Unit, onSave: (String, String, String) -> Unit) {
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf("Powerlifting") }
-
-    val exerciseTypes = listOf("Powerlifting", "Calisthenics", "Bodybuilding", "Cardio")
-
-    AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
-        onDismissRequest = onDismiss,
-        confirmButton = { TextButton(onClick = { onSave(title, description, selectedType) }) { Text("Sačuvaj") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Otkaži") } },
-        title = { Text("Dodaj novi rekord") },
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = title,
-
-                    onValueChange = { title = it }, label = { Text("Naziv vežbe") })
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Opis") })
-                DropdownMenuBox(selectedType, exerciseTypes) { selectedType = it }
-            }
-        }
-    )
-}
-
-@Composable
-fun DropdownMenuBox(selectedType: String, types: List<String>, onSelect: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-
-        expanded = expanded, onExpandedChange = { expanded = !expanded }
-    )
-    {
-        OutlinedTextField(
-            value = selectedType,
-            onValueChange = {},
-            label = { Text("Tip vežbe") },
-            readOnly = true,
-            modifier = Modifier.menuAnchor()
-        )
-        DropdownMenu(
-            containerColor = MaterialTheme.colorScheme.surface,
-            expanded = expanded, onDismissRequest = { expanded = false }
-        ) {
-            types.forEach {
-                DropdownMenuItem(
-
-                    text = { Text(it) }, onClick = {
-                    onSelect(it)
-                    expanded = false
-                })
             }
         }
     }

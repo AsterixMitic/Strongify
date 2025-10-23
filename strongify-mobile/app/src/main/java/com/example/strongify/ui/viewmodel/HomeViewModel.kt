@@ -1,14 +1,21 @@
 package com.example.strongify.ui.viewmodel
 
+import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.strongify.data.repository.GymRepository
 import com.example.strongify.data.model.GymRecord
+import com.example.strongify.data.repository.CloudinaryStorageRepository
+import com.example.strongify.data.repository.GymRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repo: GymRepository = GymRepository()) : ViewModel() {
+class HomeViewModel(
+    private val repo: GymRepository = GymRepository(),
+    private val cloudinaryRepo: CloudinaryStorageRepository = CloudinaryStorageRepository()
+) : ViewModel() {
 
     private val _records = MutableStateFlow<List<GymRecord>>(emptyList())
     val records: StateFlow<List<GymRecord>> = _records
@@ -24,4 +31,72 @@ class HomeViewModel(private val repo: GymRepository = GymRepository()) : ViewMod
             repo.addRecord(record)
         }
     }
+
+    fun addRecord(
+        record: GymRecord,
+        imageUri: Uri?,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            try {
+                val scoredRecord = record.copy(score = calculateScore(record))
+                val docRef = repo.addRecordAndReturnRef(scoredRecord)
+                val recordId = docRef.id
+
+                var imageUrl: String? = null
+                if (imageUri != null) {
+                    imageUrl = cloudinaryRepo.uploadMarkerImage(imageUri, context)
+                    repo.updateRecordImage(recordId, imageUrl)
+                }
+
+                _records.value = _records.value + scoredRecord.copy(id = recordId, imageUrl = imageUrl)
+
+                repo.updateUserScore( scoredRecord.score)
+
+                _uploadState.value = UploadState.Success(imageUrl ?: "")
+                Log.d("SLIKA", "${imageUrl}");
+            } catch (e: Exception) {
+                _uploadState.value = UploadState.Error(e.message ?: "Greška prilikom dodavanja rekorda")
+            }
+        }
+    }
+
+    private fun calculateScore(record: GymRecord): Int {
+        return when (record.exerciseType) {
+            "Powerlifting", "Bodybuilding"-> {
+                (record.weight!! * record.reps!! * record.sets!!).toInt()
+            }
+            "Cardio" -> {
+                (record.distance!! * 100).toInt()
+            }
+            else -> {
+                (record.reps!! * 20).toInt()
+            }
+        }
+    }
+
+    private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
+    val uploadState: StateFlow<UploadState> = _uploadState
+
+    fun uploadRecordImage(uri: Uri, context: Context, id: String) {
+        viewModelScope.launch {
+            try {
+                _uploadState.value = UploadState.Loading
+                val imageUrl = cloudinaryRepo.uploadMarkerImage(uri, context)
+                Log.e("URI", imageUrl)
+                repo.updateRecordImage(id, imageUrl)
+                _uploadState.value = UploadState.Success(imageUrl)
+            } catch (e: Exception) {
+                _uploadState.value = UploadState.Error(e.message ?: "Greška prilikom slanja slike")
+            }
+        }
+    }
+
+    sealed class UploadState {
+        object Idle : UploadState()
+        object Loading : UploadState()
+        data class Success(val url: String) : UploadState()
+        data class Error(val message: String) : UploadState()
+    }
+
 }
