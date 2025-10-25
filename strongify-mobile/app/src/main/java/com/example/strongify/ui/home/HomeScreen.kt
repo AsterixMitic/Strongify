@@ -93,6 +93,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
         position = CameraPosition.fromLatLngZoom(currentLatLng, 15f)
     }
     val coroutineScope = rememberCoroutineScope()
+    val isInitialPosition = remember { mutableStateOf(true) }
+
     DisposableEffect(hasPermission) {
         if (hasPermission) {
             val callback = object : LocationCallback() {
@@ -101,11 +103,14 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     val newLatLng = LatLng(newLocation.latitude, newLocation.longitude)
                     currentLatLng = newLatLng
 
-                    coroutineScope.launch {
-                        cameraPositionState.animate(
-                            CameraUpdateFactory.newLatLngZoom(newLatLng, 15f),
-                            1000
-                        )
+                    if (isInitialPosition.value) {
+                        coroutineScope.launch {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(newLatLng, 15f),
+                                1000
+                            )
+                            isInitialPosition.value = false
+                        }
                     }
                 }
             }
@@ -120,6 +125,23 @@ fun HomeScreen(viewModel: HomeViewModel) {
 
     var showDialog by remember { mutableStateOf(false) }
 
+    var selectedRecord by remember { mutableStateOf<GymRecord?>(null) }
+    var selectedUsername by remember { mutableStateOf("") }
+    var selectedUserImage by remember { mutableStateOf<String?>(null) }
+    if (selectedRecord != null) {
+        RecordDetailsBottomSheet(
+            homeViewModel = viewModel,
+            context = context,
+            record = selectedRecord!!,
+            username = selectedUsername,
+            userImageUrl = selectedUserImage,
+            onDismiss = { selectedRecord = null },
+            onChallengeClick = { record ->
+
+            }
+        )
+    }
+
     Scaffold() { innerPadding ->
         Box(Modifier.fillMaxSize().padding(innerPadding)) {
             GoogleMap(
@@ -131,7 +153,15 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     Marker(
                         state = MarkerState(LatLng(record.latitude, record.longitude)),
                         title = record.title,
-                        snippet = "${record.exerciseType}",
+                        snippet = record.id,
+                        onClick = {
+                            selectedRecord = record
+                            viewModel.getUserById(record.userId) { user ->
+                                selectedUsername = user?.username ?: "Nepoznat korisnik"
+                                selectedUserImage = user?.profileImageUrl
+                            }
+                            false
+                        },
                         icon = BitmapDescriptorFactory.defaultMarker(getMarkerColor(record.exerciseType))
                     )
                 }

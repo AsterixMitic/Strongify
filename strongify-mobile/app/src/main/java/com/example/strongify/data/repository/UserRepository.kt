@@ -40,4 +40,10 @@ class UserRepository {
         }.await()
     }
 
+    suspend fun getUserById(userId: String): User? {
+        val snapshot = usersCollection.document(userId).get().await()
+        return snapshot.toObject(User::class.java)
+    }
+
+
 }

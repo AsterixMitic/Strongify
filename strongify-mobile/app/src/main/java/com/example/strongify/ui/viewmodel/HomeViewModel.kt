@@ -6,8 +6,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.strongify.data.model.GymRecord
+import com.example.strongify.data.model.User
 import com.example.strongify.data.repository.CloudinaryStorageRepository
 import com.example.strongify.data.repository.GymRepository
+import com.example.strongify.data.repository.UserRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,14 +81,19 @@ class HomeViewModel(
     private val _uploadState = MutableStateFlow<UploadState>(UploadState.Idle)
     val uploadState: StateFlow<UploadState> = _uploadState
 
-    fun uploadRecordImage(uri: Uri, context: Context, id: String) {
+    fun uploadRecordImage(uri: Uri, context: Context, recordId: String, userId: String) {
         viewModelScope.launch {
             try {
                 _uploadState.value = UploadState.Loading
                 val imageUrl = cloudinaryRepo.uploadMarkerImage(uri, context)
-                Log.e("URI", imageUrl)
-                repo.updateRecordImage(id, imageUrl)
+
+                repo.updateRecordImage(recordId, imageUrl)
+
+                val bonusPoints = 50
+                repo.updateUserScore( bonusPoints)
+
                 _uploadState.value = UploadState.Success(imageUrl)
+
             } catch (e: Exception) {
                 _uploadState.value = UploadState.Error(e.message ?: "Greška prilikom slanja slike")
             }
@@ -127,6 +134,18 @@ class HomeViewModel(
         }
     }
 
+    private val userRepo = UserRepository()
+
+    fun getUserById(userId: String, onResult: (User?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val user = userRepo.getUserById(userId)
+                onResult(user)
+            } catch (e: Exception) {
+                onResult(null)
+            }
+        }
+    }
     sealed class UploadState {
         object Idle : UploadState()
         object Loading : UploadState()
