@@ -6,31 +6,27 @@ export class Location {
   @PrimaryGeneratedColumn('uuid', { name: 'id' })
   id: string;
 
-  @Column()
+  @Column({ name: 'name' })
   name: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 8 })
+  @Column({ name: 'latitude', type: 'numeric', precision: 9, scale: 6 })
   latitude: number;
 
-  @Column({ type: 'decimal', precision: 11, scale: 8 })
+  @Column({ name: 'longitude', type: 'numeric', precision: 9, scale: 6 })
   longitude: number;
 
-  @Column({ nullable: true })
-  address: string;
+  // DB uses `description` column
+  @Column({ name: 'description', type: 'text', nullable: true })
+  description?: string | null;
 
-  @Column({ nullable: true })
-  description: string;
+  // image URL in DB
+  @Column({ name: 'image_url', type: 'text', nullable: true })
+  imageUrl?: string | null;
 
-  @Column({ default: 'gym' })
-  type: 'gym' | 'outdoor' | 'home';
-
-  @Column({ default: true })
-  isActive: boolean;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
   @OneToMany(() => WorkoutRecord, workoutRecord => workoutRecord.location)

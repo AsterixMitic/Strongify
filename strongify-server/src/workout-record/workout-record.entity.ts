@@ -19,12 +19,14 @@ export class WorkoutRecord {
     onDelete: 'CASCADE',
     nullable: false,
   })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ManyToOne(() => Location, (l) => l.workoutRecords, {
     onDelete: 'SET NULL',
     nullable: true,
   })
+  @JoinColumn({ name: 'location_id' })
   location?: Location | null;
 
   @ManyToOne(() => ExerciseType, (t) => t.workoutRecords, {

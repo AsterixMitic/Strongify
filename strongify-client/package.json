@@ -32,9 +32,12 @@
     "class-validator": "^0.14.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "leaflet": "^1.9.4",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.3",
     "@angular/build": "^20.1.4",
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.0",
