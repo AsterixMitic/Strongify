@@ -1,0 +1,155 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Join Strongify</h1>
+      <p class="subtitle">Create your account to start your fitness journey</p>
+    </div>
+
+    @if (error) {
+      <div class="alert alert-error" role="alert">
+        <span class="alert-icon">⚠️</span>
+        <p>{{ error }}</p>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="register-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          [value]="form.value.username"
+          (input)="onInputString('username', ($any($event.target)).value)"
+          class="form-input"
+          [class.error]="form.controls.username.invalid && form.controls.username.dirty"
+          placeholder="Choose a username"
+          autocomplete="username"
+        />
+        @if (form.controls.username.invalid && form.controls.username.dirty) {
+          <span class="form-error">
+            @if (form.controls.username.errors?.['required']) {
+              Username is required
+            } @else if (form.controls.username.errors?.['minlength']) {
+              Username must be at least 3 characters
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          [value]="form.value.email"
+          (input)="onInputString('email', ($any($event.target)).value)"
+          class="form-input"
+          [class.error]="form.controls.email.invalid && form.controls.email.dirty"
+          placeholder="Enter your email"
+          autocomplete="email"
+        />
+        @if (form.controls.email.invalid && form.controls.email.dirty) {
+          <span class="form-error">
+            @if (form.controls.email.errors?.['required']) {
+              Email is required
+            } @else if (form.controls.email.errors?.['email']) {
+              Please enter a valid email address
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="passwordHash" class="form-label">Password</label>
+        <input
+          id="passwordHash"
+          type="password"
+          formControlName="passwordHash"
+          [value]="form.value.passwordHash"
+          (input)="onInputString('passwordHash', ($any($event.target)).value)"
+          class="form-input"
+          [class.error]="form.controls.passwordHash.invalid && form.controls.passwordHash.dirty"
+          placeholder="Create a password"
+          autocomplete="new-password"
+        />
+        @if (form.controls.passwordHash.invalid && form.controls.passwordHash.dirty) {
+          <span class="form-error">
+            @if (form.controls.passwordHash.errors?.['required']) {
+              Password is required
+            } @else if (form.controls.passwordHash.errors?.['minlength']) {
+              Password must be at least 6 characters
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          [value]="form.value.confirmPassword"
+          (input)="onInputString('confirmPassword', ($any($event.target)).value)"
+          class="form-input"
+          [class.error]="form.controls.confirmPassword.invalid && form.controls.confirmPassword.dirty"
+          placeholder="Confirm your password"
+          autocomplete="new-password"
+        />
+        @if (form.controls.confirmPassword.invalid && form.controls.confirmPassword.dirty) {
+          <span class="form-error">
+            @if (form.controls.confirmPassword.errors?.['required']) {
+              Please confirm your password
+            } @else if (form.controls.confirmPassword.errors?.['minlength']) {
+              Password must be at least 6 characters
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="avatar" class="form-label">Profile Picture (Optional)</label>
+        <div class="file-upload-area">
+          <input
+            id="avatar"
+            type="file"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            class="file-input"
+          />
+          <label for="avatar" class="file-label">
+            @if (selectedFile) {
+              <span>{{ selectedFile.name }}</span>
+              <span class="remove-file" (click)="removeAvatar()">✕</span>
+            } @else {
+              <span>📁 Choose an image (max 5MB)</span>
+            }
+          </label>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        class="submit-button"
+        [disabled]="loading || form.invalid"
+        [class.loading]="loading"
+      >
+        @if (loading) {
+          <span class="spinner"></span>
+          <span>Creating account...</span>
+        } @else {
+          <span>Sign Up</span>
+        }
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p class="login-link">
+        Already have an account? 
+        <a routerLink="/login" class="link">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

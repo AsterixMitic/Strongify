@@ -9,6 +9,11 @@ import { LocationModule } from './location/location.module';
 import { WorkoutRecord } from './workout-record/workout-record.entity';
 import { User } from './user/user.entity';
 import { Location } from './location/location.entity'
+import { ExerciseTypeModule } from './exercise-type/exercise-type.module';
+import { LeaderboardEntryModule } from './leaderboard-entry/leaderboard-entry.module';
+import { ExerciseType } from './exercise-type/exercise-type.entity';
+import { LeaderboardEntry } from './leaderboard-entry/leaderboard-entry.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,14 +28,17 @@ import { Location } from './location/location.entity'
         username: config.get<string>('DB_USERNAME')!,
         password: config.get<string>('DB_PASSWORD')!,
         database: config.get<string>('DB_DATABASE')!,
-        entities: [User, WorkoutRecord, Location],
+        entities: [User, WorkoutRecord, Location, ExerciseType, LeaderboardEntry],
         synchronize: false,
       }),
       inject: [ConfigService],  
     }),
     UserModule,
     WorkoutRecordModule,
-    LocationModule
+    LocationModule,
+    ExerciseTypeModule,
+    LeaderboardEntryModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

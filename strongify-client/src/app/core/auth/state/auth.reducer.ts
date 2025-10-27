@@ -1,0 +1,52 @@
+import { createReducer, on } from '@ngrx/store';
+import { UserDto } from '../../../feature/user/data/user.dto';
+import { AuthActions } from './auth.actions';
+
+export type AuthStatus = 'anonymous' | 'authenticated' | 'loading' | 'error';
+
+export interface AuthState {
+  user: UserDto | null;
+  status: string;
+  error?: string;
+}
+
+export const initialAuthState: AuthState = {
+  user: null,
+  status: 'anonymous',
+  error: undefined,
+};
+
+export const authReducer = createReducer(
+  initialAuthState,
+  on(AuthActions.login, (state) => ({
+    ...state,
+    status: 'loading',
+  })),
+  on(AuthActions.loginSuccess, (state) => ({
+    ...state,
+    status: 'authenticated',
+  })),
+  on(AuthActions.loginFailure, (state, { error }) => ({
+    ...state,
+    status: 'error',
+    error,
+    user: null,
+  })),
+  on(AuthActions.loadUser, (state) => ({
+    ...state,
+    status: 'loading',
+  })),
+  on(AuthActions.loadUserSuccess, (state, { user }) => ({
+    ...state,
+    user,
+    status: 'authenticated',
+    error: undefined,
+  })),
+  on(AuthActions.loadUserFailure, (state, { error }) => ({
+    ...state,
+    status: 'error',
+    error,
+    user: null,
+  })),
+  on(AuthActions.logout, () => initialAuthState)
+);

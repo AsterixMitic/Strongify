@@ -3,7 +3,7 @@ import { WorkoutRecord } from '../workout-record/workout-record.entity';
 
 @Entity('locations')
 export class Location {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
   id: string;
 
   @Column()

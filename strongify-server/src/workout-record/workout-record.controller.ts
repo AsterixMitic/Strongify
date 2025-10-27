@@ -19,16 +19,16 @@ export class WorkoutRecordController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.workoutRecordService.findOne(+id);
+    return this.workoutRecordService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateWorkoutRecordDto: UpdateWorkoutRecordDto) {
-    return this.workoutRecordService.update(+id, updateWorkoutRecordDto);
+    return this.workoutRecordService.update(id, updateWorkoutRecordDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.workoutRecordService.remove(+id);
+    return this.workoutRecordService.remove(id);
   }
 }

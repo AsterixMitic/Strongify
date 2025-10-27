@@ -1,0 +1,38 @@
+@if (user(); as currentUser) {
+  <div class="home-container">
+
+    <!-- Main Content -->
+    <main class="main">
+      <div class="welcome">
+        <h2>Welcome back</h2>
+        <p>Ready to get started?</p>
+      </div>
+
+      <!-- Simple Stats -->
+      <div class="stats">
+        <div class="stat">
+          <div class="number">0</div>
+          <div class="label">Workouts</div>
+        </div>
+        <div class="stat">
+          <div class="number">0</div>
+          <div class="label">Streak</div>
+        </div>
+        <div class="stat">
+          <div class="number">0</div>
+          <div class="label">Points</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn-primary">Start Workout</button>
+        <button class="btn-secondary">View Progress</button>
+      </div>
+    </main>
+  </div>
+} @else {
+  <div class="loading">
+    <div class="spinner"></div>
+  </div>
+}

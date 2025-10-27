@@ -1,44 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { WorkoutRecord } from '../workout-record/workout-record.entity'
+import {
+  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
+  OneToMany, Index
+} from 'typeorm';
+import { WorkoutRecord } from 'src/workout-record/workout-record.entity';
+import { LeaderboardEntry } from 'src/leaderboard-entry/leaderboard-entry.entity';
+
 
 @Entity('users')
+@Index('UQ_users_email', ['email'], { unique: true })
+@Index('UQ_users_username', ['username'], { unique: true })
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
   id: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
-  @Column()
-  password: string;
+  @Column({ name: 'password_hash', type: 'varchar', length: 255 })
+  passwordHash: string;
 
-  @Column({ nullable: true })
-  firstName: string;
+  @Column({ name: 'profile_image_url', type: 'text', nullable: true })
+  profileImageUrl?: string | null;
 
-  @Column({ nullable: true })
-  lastName: string;
-
-  @Column({ default: 0 })
-  totalPoints: number;
-
-  @Column({ default: 0 })
-  level: number;
-
-  @Column({ nullable: true })
-  profileImage: string;
-
-  @Column({ default: true })
-  isActive: boolean;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
-  @OneToMany(() => WorkoutRecord, workoutRecord => workoutRecord.user)
+  @OneToMany(() => WorkoutRecord, (wr) => wr.user)
   workoutRecords: WorkoutRecord[];
+
+  @OneToMany(() => LeaderboardEntry, (le) => le.user)
+  leaderboardEntries: LeaderboardEntry[];
 }

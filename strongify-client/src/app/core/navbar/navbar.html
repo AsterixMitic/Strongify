@@ -1,0 +1,17 @@
+<nav class="navbar">
+  <div class="navbar-content">
+    <a routerLink="/dashboard" class="navbar-brand">
+      💪 Strongify
+    </a>
+    
+    <div class="navbar-links">
+      @if (isAuthenticated()) {
+        <a routerLink="/home" class="nav-link">Home</a>
+        <button (click)="logout()" class="nav-link logout-btn">Logout</button>
+      } @else {
+        <a routerLink="/login" class="nav-link">Login</a>
+        <a routerLink="/register" class="nav-link">Register</a>
+      }
+    </div>
+  </div>
+</nav>
