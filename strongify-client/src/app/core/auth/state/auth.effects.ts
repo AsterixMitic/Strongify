@@ -61,7 +61,7 @@ export class AuthEffects {
     )
   );
 
-//On load user success: navigate to the current url or to the root url
+//On load user success: navigate only if coming from login/register
 navigateAfterLogin$ = createEffect(
   () =>
     this.actions$.pipe(
@@ -71,6 +71,7 @@ navigateAfterLogin$ = createEffect(
         const tree = this.router.parseUrl(currentUrl);
         const raw = tree.queryParams['redirect'];
 
+        // Only redirect if there's a redirect param or if on login/register pages
         if (typeof raw === 'string' && raw.startsWith('/')) {
           this.router.navigateByUrl(raw, { replaceUrl: true });
           return;
@@ -80,7 +81,6 @@ navigateAfterLogin$ = createEffect(
           this.router.navigateByUrl('/home', { replaceUrl: true });
           return;
         }
-        
       })
     ),
   { dispatch: false }

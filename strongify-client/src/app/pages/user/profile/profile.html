@@ -1,0 +1,52 @@
+@if (user(); as currentUser) {
+  <div class="profile-container">
+    <div class="profile-header">
+      <h1>Profile</h1>
+      <div class="profile-actions">
+        <button class="btn btn-secondary" (click)="onUpdateProfile()">
+          Edit Profile
+        </button>
+        <button class="btn btn-danger" (click)="onLogout()">
+          Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-card">
+        <div class="avatar-section">
+          @if (currentUser.profileImageUrl) {
+            <img [src]="currentUser.profileImageUrl" [alt]="currentUser.username" class="avatar">
+          } @else {
+            <div class="avatar-placeholder">
+              {{ currentUser.username.charAt(0).toUpperCase() }}
+            </div>
+          }
+        </div>
+        <div class="info-section">
+          <h2>{{ currentUser.username }}</h2>
+          <p class="email">{{ currentUser.email }}</p>
+          <p class="member-since">Member since {{ currentUser.createdAt | date:'longDate' }}</p>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <h3>Account Stats</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">Workouts</div>
+            <div class="stat-value">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Total Points</div>
+            <div class="stat-value">0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="loading-container">
+    <div class="spinner"></div>
+  </div>
+}

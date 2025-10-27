@@ -18,13 +18,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { StorageService } from 'src/storage/storage.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UserService,
-    // private storage: StorageService,
+    private storage: StorageService,
   ) {}
 
   @Post('login')
@@ -66,10 +67,10 @@ export class AuthController {
 
     const created = await this.authService.register(user);
 
-    // if (image) {
-    //   const { path } = await this.storage.uploadUserAvatar(created.id, image);
-    //   await this.usersService.updateAvatar(created.id, path);
-    // }
+    if (image) {
+      const { path } = await this.storage.uploadUserAvatar(created.id, image);
+      await this.usersService.updateAvatar(created.id, path);
+    }
 
     return created;
   }

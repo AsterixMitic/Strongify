@@ -11,7 +11,7 @@ export class UserCreateDto{
         minLowercase: 1,
         minUppercase: 1,
         minNumbers: 1,
-        minSymbols: 1,
+        minSymbols: 0,
     })
     passwordHash: string;
 

@@ -74,12 +74,15 @@
           placeholder="Create a password"
           autocomplete="new-password"
         />
+        <small class="form-hint">
+          Must be at least 8 characters with uppercase, lowercase, and number
+        </small>
         @if (form.controls.passwordHash.invalid && form.controls.passwordHash.dirty) {
           <span class="form-error">
             @if (form.controls.passwordHash.errors?.['required']) {
               Password is required
             } @else if (form.controls.passwordHash.errors?.['minlength']) {
-              Password must be at least 6 characters
+              Password must be at least 8 characters
             }
           </span>
         }
@@ -103,7 +106,7 @@
             @if (form.controls.confirmPassword.errors?.['required']) {
               Please confirm your password
             } @else if (form.controls.confirmPassword.errors?.['minlength']) {
-              Password must be at least 6 characters
+              Password must be at least 8 characters
             }
           </span>
         }

@@ -28,7 +28,7 @@ export class AuthService {
     );
   }
 
-  register(dto: UserCreateDto, image?: File) {
+  register(dto: { username: string; email: string; password: string }, image?: File) {
     const url = `${this.base}/auth/register`;
 
     const request$ = image
@@ -40,7 +40,7 @@ export class AuthService {
     );
   }
 
-  private toFormData(dto: UserCreateDto, image: File): FormData {
+  private toFormData(dto: { username: string; email: string; password: string }, image: File): FormData {
     const fd = new FormData();
     Object.entries(dto).forEach(([k, v]) => {
       if (v !== undefined && v !== null) fd.append(k, String(v));

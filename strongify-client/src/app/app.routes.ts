@@ -3,6 +3,8 @@ import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { Home } from './pages/home/home';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Profile } from './pages/user/profile/profile';
+import { UserUpdate } from './pages/user/user-update/user-update';
 import { authGuard, redirectLoggedInToApp, redirectLoggedInFromDashboard, matchAuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -25,6 +27,20 @@ export const routes: Routes = [
     path: 'home',
     component: Home,
     canActivate: [authGuard]
+  },
+  {
+    path: 'user',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'profile',
+        component: Profile
+      },
+      {
+        path: 'update',
+        component: UserUpdate
+      }
+    ]
   },
   {
     path: '',

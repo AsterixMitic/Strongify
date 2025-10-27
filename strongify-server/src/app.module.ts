@@ -14,6 +14,7 @@ import { LeaderboardEntryModule } from './leaderboard-entry/leaderboard-entry.mo
 import { ExerciseType } from './exercise-type/exercise-type.entity';
 import { LeaderboardEntry } from './leaderboard-entry/leaderboard-entry.entity';
 import { AuthModule } from './auth/auth.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { AuthModule } from './auth/auth.module';
     LocationModule,
     ExerciseTypeModule,
     LeaderboardEntryModule,
-    AuthModule
+    AuthModule,
+    StorageModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,20 +1,14 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class UserNotFoundException extends HttpException {
-  constructor(userId: number) {
+  constructor(userId: number | string) {
     super(`User with ID ${userId} not found`, HttpStatus.NOT_FOUND);
   }
 }
 
-export class GroupNotFoundException extends HttpException {
-  constructor(groupId: number) {
-    super(`Group with ID ${groupId} not found`, HttpStatus.NOT_FOUND);
-  }
-}
-
-export class ExpenseNotFoundException extends HttpException {
-  constructor(expenseId: number) {
-    super(`Expense with ID ${expenseId} not found`, HttpStatus.NOT_FOUND);
+export class LocationNotFoundException extends HttpException {
+  constructor(locationId: number | string) {
+    super(`Location with ID ${locationId} not found`, HttpStatus.NOT_FOUND);
   }
 }
 

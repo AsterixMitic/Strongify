@@ -1,0 +1,15 @@
+@if (isOpen()) {
+  <div class="dialog-overlay" (click)="onCancel()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      <h3 class="dialog-title">{{ question }}</h3>
+      <div class="dialog-actions">
+        <button class="btn btn-secondary" (click)="onCancel()">
+          {{ cancelText }}
+        </button>
+        <button class="btn btn-primary" (click)="onConfirm()">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

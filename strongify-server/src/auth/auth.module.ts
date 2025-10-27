@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtStrategy } from './jwt.strategy';
+import { StorageModule } from 'src/storage/storage.module';
 
 @Module({
   imports: [PassportModule,
@@ -15,7 +16,8 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: '60m' },
     }),
     TypeOrmModule.forFeature([User]),
-    forwardRef(() => UserModule)
+    forwardRef(() => UserModule),
+    StorageModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

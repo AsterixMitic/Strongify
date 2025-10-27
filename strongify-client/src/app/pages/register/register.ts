@@ -24,8 +24,8 @@ export class Register {
   form = this.fb.nonNullable.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
-    passwordHash: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+    passwordHash: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   onInputString(
@@ -51,10 +51,10 @@ export class Register {
     this.loading = true;
     this.error = null;
 
-    const dto: UserCreateDto = {
+    const dto = {
       username: this.form.value.username!,
       email: this.form.value.email!,
-      passwordHash
+      password: passwordHash
     };
 
     this.authService.register(dto, this.selectedFile ?? undefined)
