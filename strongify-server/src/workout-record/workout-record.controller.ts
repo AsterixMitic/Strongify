@@ -13,11 +13,13 @@ export class WorkoutRecordController {
   create(@Req() req: Request, @Body() createWorkoutRecordDto: CreateWorkoutRecordDto) {
     // attach authenticated user id server-side to prevent trusting client
     const user = (req as any).user;
+    type CreateWithUser = CreateWorkoutRecordDto & { user?: { id: number } };
+    const payload: CreateWithUser = { ...createWorkoutRecordDto } as CreateWithUser;
     if (user && user.userId) {
       // ensure relation is set using id only
-      (createWorkoutRecordDto as any).user = { id: user.userId };
+      payload.user = { id: user.userId };
     }
-    return this.workoutRecordService.create(createWorkoutRecordDto);
+    return this.workoutRecordService.create(payload as any);
   }
 
   @Get()

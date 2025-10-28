@@ -7,10 +7,15 @@ import { AuthActions } from '../../core/auth/state/auth.actions';
 import { selectUser } from '../../core/auth/state/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocationService } from '../../core/services/location.service';
-import { firstValueFrom } from 'rxjs';
-import { LocationDto } from '../../feature/location/data/location.dto';
+import { firstValueFrom, zip, Subscription } from 'rxjs';
+import { LocationDto, ExerciseTypeDto } from '../../feature/location/data/location.dto';
 import { WorkoutRecordDto } from '../../feature/location/data/workout-record.dto';
 import { environment } from '../../../environment/environment';
+
+// NormalizedRecord is a lightweight shape used only inside the Home component
+// to represent the latest record for a location. We keep it as Partial so we
+// don't conflict with the server DTO which requires `value: number`.
+type NormalizedRecord = Partial<WorkoutRecordDto> & { exercise?: string; value?: number | undefined; createdAt?: string | undefined; locationId?: string; reps?: number; weightKg?: number; durationSec?: number; exerciseType?: { name?: string } };
 
 import * as L from 'leaflet';
 import { io, Socket } from 'socket.io-client';
@@ -36,12 +41,17 @@ export class Home implements AfterViewInit, OnDestroy {
   user = toSignal(this.store.select(selectUser), { initialValue: null });
 
   // map state
-  private markers: Record<string, any> = {};
-  private records: Record<string, WorkoutRecordDto | null> = {};
+  private markers: Record<string, L.Marker> = {};
+  // NormalizedRecord is a lightweight shape used only inside the Home component
+  // to represent the latest record for a location. We keep it as Partial so we
+  // don't conflict with the server DTO which requires `value: number`.
+  // records map holds latest normalized record per location.
+  private records: Record<string, NormalizedRecord | null> = {};
   private pollHandle: any = null;
   private map: L.Map | null = null;
   private socket: Socket | null = null;
-  private exerciseTypes: any[] = [];
+  private exerciseTypes: ExerciseTypeDto[] = [];
+  private recordsSub: Subscription | null = null;
 
   async ngAfterViewInit() {
     // wait for authenticated user, then setup map so the DOM and route content are present
@@ -62,8 +72,20 @@ export class Home implements AfterViewInit, OnDestroy {
         // payload may include nested relations; normalize to location id
         const locId = payload?.location?.id || payload?.locationId || payload?.location_id || null;
         if (locId) {
+          // normalize incoming payload into our client-side NormalizedRecord shape
+          const normalized: NormalizedRecord = {
+            id: payload?.id,
+            userId: payload?.userId,
+            locationId: locId,
+            exercise: payload?.exerciseType?.name ?? payload?.exercise ?? '',
+            reps: payload?.reps,
+            weightKg: payload?.weightKg,
+            durationSec: payload?.durationSec,
+            value: payload?.value ?? payload?.reps ?? payload?.weightKg ?? payload?.durationSec ?? undefined,
+            createdAt: payload?.createdAt
+          };
           // store latest record for location
-          this.records[locId] = payload as WorkoutRecordDto;
+          this.records[locId] = normalized;
           // update popup if marker exists
           const marker = this.markers[locId];
           if (marker) {
@@ -104,6 +126,10 @@ export class Home implements AfterViewInit, OnDestroy {
       this.socket.disconnect();
       this.socket = null;
     }
+    if (this.recordsSub) {
+      this.recordsSub.unsubscribe();
+      this.recordsSub = null;
+    }
   }
 
   private async setupMap() {
@@ -122,26 +148,69 @@ export class Home implements AfterViewInit, OnDestroy {
       // ensure map renders correctly when container becomes visible
       this.ensureMapVisible(map);
 
-  const locations = await this.locationService.getLocations();
-      const defaultIcon = this.createPinIcon();
-      locations.forEach((loc: LocationDto) => {
-        const marker = L.marker([loc.latitude, loc.longitude], { icon: defaultIcon, riseOnHover: true }).addTo(map);
-        marker.bindPopup(this.popupHtml(loc));
-        this.markers[loc.id] = marker;
-      });
-
-  // ensure map sizing after markers added (helps when container was hidden during navigation)
-  this.ensureMapVisible(map);
-
-      // load exercise types for prompts
+      // load locations, exercise types and records concurrently using RxJS zip
       try {
-  this.exerciseTypes = await this.locationService.getExerciseTypes();
-      } catch (err) {
-        console.warn('Failed to load exercise types', err);
-      }
+        // zip the three observables and subscribe to the combined result
+        zip(
+          this.locationService.getLocations(),
+          this.locationService.getExerciseTypes(),
+          this.locationService.getRecords()
+        ).subscribe({
+          next: ([locations, exerciseTypes, records]) => {
+            const defaultIcon = this.createPinIcon();
+            locations.forEach((loc: LocationDto) => {
+              const marker = L.marker([loc.latitude, loc.longitude], { icon: defaultIcon, riseOnHover: true }).addTo(map);
+              marker.bindPopup(this.popupHtml(loc));
+              this.markers[loc.id] = marker;
+            });
 
-      // initial records load
-      await this.refreshRecords();
+            // ensure map sizing after markers added (helps when container was hidden during navigation)
+            this.ensureMapVisible(map);
+
+            // set exercise types cache
+            this.exerciseTypes = exerciseTypes;
+
+            // normalize records (we reuse the same normalization logic as refreshRecords)
+            try {
+              // Use Partial<WorkoutRecordDto> so fields like `value` are optional here
+              // and can be set to `number | null` during normalization.
+              type RawRecord = Partial<WorkoutRecordDto> & { location?: { id?: string }; locationId?: string; location_id?: string; exerciseType?: { name?: string }; weightKg?: number; durationSec?: number; reps?: number };
+              const byLoc: Record<string, RawRecord & { exercise?: string; value?: number | undefined; createdAt?: string | undefined }> = {};
+              records.forEach(r => {
+                const rr = r as RawRecord;
+                const locId = rr?.location?.id ?? rr.locationId ?? rr.location_id ?? null;
+                if (!locId) return;
+                const existing = byLoc[locId];
+                const createdAt = rr.createdAt ? new Date(rr.createdAt).getTime() : 0;
+                if (!existing || createdAt > (existing.createdAt ? new Date(existing.createdAt).getTime() : 0)) {
+                  const exerciseName = rr.exerciseType?.name ?? rr.exercise ?? '';
+                  const value = rr.reps ?? rr.weightKg ?? rr.durationSec ?? undefined;
+                  const entry: RawRecord & { exercise?: string; value?: number | undefined; createdAt?: string | undefined } = {
+                    id: rr.id,
+                    userId: rr.userId,
+                    locationId: locId,
+                    exercise: exerciseName,
+                    reps: rr.reps,
+                    weightKg: rr.weightKg,
+                    durationSec: rr.durationSec,
+                    exerciseType: rr.exerciseType,
+                    value,
+                    createdAt: rr.createdAt
+                  };
+                  byLoc[locId] = entry;
+                }
+              });
+
+              this.records = byLoc as Record<string, NormalizedRecord | null>;
+            } catch (err) {
+              console.warn('Failed to normalize initial records', err);
+            }
+          },
+          error: (err) => console.warn('Failed to load map data', err)
+        });
+      } catch (err) {
+        console.warn('Map setup failed', err);
+      }
     } catch (err) {
       console.error('Map setup failed', err);
     }
@@ -154,7 +223,7 @@ export class Home implements AfterViewInit, OnDestroy {
       <div class="loc-popup">
         <strong>${loc.name}</strong>
         <div class="desc">${loc.description ?? ''}</div>
-  ${((loc as any).imageUrl) ? `<div class="img-wrap"><img src="${(loc as any).imageUrl}" alt="${loc.name}" /></div>` : ''}
+  ${loc.imageUrl ? `<div class="img-wrap"><img src="${loc.imageUrl}" alt="${loc.name}" /></div>` : ''}
         <div class="record">Top: <span data-loc-record>${recText}</span></div>
         <div class="actions">
           <button class="btn-primary set-record-btn" data-loc-id="${loc.id}">Set new record</button>
@@ -204,45 +273,68 @@ export class Home implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async refreshRecords() {
-    try {
-      const records = await this.locationService.getRecords();
-      // keep only latest per location (by createdAt). Normalize records to include locationId, exercise name and value
-      const byLoc: Record<string, any> = {};
-      records.forEach(r => {
-        const rr: any = r as any;
-        const locId = rr?.location?.id ?? rr.locationId ?? rr.location_id ?? null;
-        if (!locId) return;
-        const existing = byLoc[locId];
-        const createdAt = rr.createdAt ? new Date(rr.createdAt).getTime() : 0;
-        if (!existing || createdAt > (existing.createdAt ? new Date(existing.createdAt).getTime() : 0)) {
-          const exerciseName = rr.exerciseType?.name ?? rr.exercise ?? '';
-          const value = rr.reps ?? rr.weightKg ?? rr.durationSec ?? null;
-          byLoc[locId] = { ...rr, locationId: locId, exercise: exerciseName, value, createdAt: rr.createdAt };
-        }
-      });
-
-      this.records = byLoc;
-      // update marker popups
-      Object.keys(this.markers).forEach(id => {
-        const marker = this.markers[id];
-        const locRecord = this.records[id] ?? null;
-        // update stored record
-        this.records[id] = locRecord;
-        // update popup content
-        const popup = marker.getPopup();
-        if (!popup) return;
-        const oldHtml = popup.getContent();
-        if (typeof oldHtml === 'string') {
-          // replace the record text inside span[data-loc-record]
-          const newText = locRecord ? `${locRecord.exercise}: ${locRecord.value}` : 'No record yet';
-          const newHtml = oldHtml.replace(/<span data-loc-record>.*?<\/span>/, `<span data-loc-record>${newText}</span>`);
-          popup.setContent(newHtml);
-        }
-      });
-    } catch (err) {
-      console.error('Failed to refresh records', err);
+  private refreshRecords() {
+    // unsubscribe previous if any
+    if (this.recordsSub) {
+      this.recordsSub.unsubscribe();
+      this.recordsSub = null;
     }
+    this.recordsSub = this.locationService.getRecords().subscribe({
+      next: (records) => {
+        try {
+          // Use Partial<WorkoutRecordDto> so fields like `value` are optional here
+          // and can be set to `number | null` during normalization.
+          type RawRecord = Partial<WorkoutRecordDto> & { location?: { id?: string }; locationId?: string; location_id?: string; exerciseType?: { name?: string }; weightKg?: number; durationSec?: number; reps?: number };
+          const byLoc: Record<string, RawRecord & { exercise?: string; value?: number | undefined; createdAt?: string | undefined }> = {};
+          records.forEach(r => {
+            const rr = r as RawRecord;
+            const locId = rr?.location?.id ?? rr.locationId ?? rr.location_id ?? null;
+            if (!locId) return;
+            const existing = byLoc[locId];
+            const createdAt = rr.createdAt ? new Date(rr.createdAt).getTime() : 0;
+            if (!existing || createdAt > (existing.createdAt ? new Date(existing.createdAt).getTime() : 0)) {
+              const exerciseName = rr.exerciseType?.name ?? rr.exercise ?? '';
+              const value = rr.reps ?? rr.weightKg ?? rr.durationSec ?? undefined;
+              const entry: RawRecord & { exercise?: string; value?: number | undefined; createdAt?: string | undefined } = {
+                id: rr.id,
+                userId: rr.userId,
+                locationId: locId,
+                exercise: exerciseName,
+                reps: rr.reps,
+                weightKg: rr.weightKg,
+                durationSec: rr.durationSec,
+                exerciseType: rr.exerciseType,
+                value,
+                createdAt: rr.createdAt
+              };
+              byLoc[locId] = entry;
+            }
+          });
+
+          this.records = byLoc as Record<string, NormalizedRecord | null>;
+          // update marker popups
+          Object.keys(this.markers).forEach(id => {
+            const marker = this.markers[id];
+            const locRecord = this.records[id] ?? null;
+            // update stored record
+            this.records[id] = locRecord;
+            // update popup content
+            const popup = marker.getPopup();
+            if (!popup) return;
+            const oldHtml = popup.getContent();
+            if (typeof oldHtml === 'string') {
+              // replace the record text inside span[data-loc-record]
+              const newText = locRecord ? `${locRecord.exercise}: ${locRecord.value}` : 'No record yet';
+              const newHtml = oldHtml.replace(/<span data-loc-record>.*?<\/span>/, `<span data-loc-record>${newText}</span>`);
+              popup.setContent(newHtml);
+            }
+          });
+        } catch (err) {
+          console.error('Failed to refresh records', err);
+        }
+      },
+      error: (err) => console.error('Failed to refresh records', err)
+    });
   }
 
   async openAddLocationDialog() {
@@ -250,9 +342,9 @@ export class Home implements AfterViewInit, OnDestroy {
   const res = await firstValueFrom(ref.afterClosed());
     if (res && res.id && this.map) {
       const defaultIcon = this.createPinIcon();
-      const created = res as any;
+      const created = res as LocationDto;
       const marker = L.marker([created.latitude, created.longitude], { icon: defaultIcon }).addTo(this.map);
-      marker.bindPopup(this.popupHtml(created as LocationDto));
+      marker.bindPopup(this.popupHtml(created));
       this.markers[created.id] = marker;
       marker.openPopup();
       // add to exercise types or other caches if needed

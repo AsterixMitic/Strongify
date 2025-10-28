@@ -7,10 +7,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { LocationService } from '../../core/services/location.service';
+import { ExerciseTypeDto, CreateRecordDto } from '../../feature/location/data/location.dto';
 
 export interface SetRecordDialogData {
   locationId: string;
-  exerciseTypes?: any[];
+  exerciseTypes?: ExerciseTypeDto[];
 }
 
 @Component({
@@ -63,7 +64,7 @@ export class SetRecordDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private locationService = inject(LocationService);
 
-  exerciseTypes: any[] = [];
+  exerciseTypes: ExerciseTypeDto[] = [];
 
   form = this.fb.group({
     exerciseTypeId: ['', Validators.required],
@@ -78,7 +79,10 @@ export class SetRecordDialogComponent implements OnInit {
     if (this.data?.exerciseTypes && this.data.exerciseTypes.length) {
       this.exerciseTypes = this.data.exerciseTypes;
     } else {
-      this.locationService.getExerciseTypes().then(list => this.exerciseTypes = list).catch(() => this.exerciseTypes = []);
+      this.locationService.getExerciseTypes().subscribe({
+        next: list => this.exerciseTypes = list,
+        error: () => this.exerciseTypes = []
+      });
     }
   }
 
@@ -86,9 +90,9 @@ export class SetRecordDialogComponent implements OnInit {
 
     const exId = this.form.value.exerciseTypeId;
     if (!exId) return;
-    const ex = this.exerciseTypes.find(e => e.id === exId) || {};
+    const ex = this.exerciseTypes.find(e => e.id === exId);
 
-    const dto: any = {
+    const dto: CreateRecordDto = {
       location: { id: this.data.locationId },
       exerciseType: { id: exId }
     };
@@ -99,25 +103,25 @@ export class SetRecordDialogComponent implements OnInit {
     const rpe = this.form.value.rpe;
     const notes = this.form.value.notes;
 
-    if (reps != null && reps !== '') dto.reps = Math.round(Number(reps));
-    if (weightKg != null && weightKg !== '') dto.weightKg = Number(weightKg);
-    if (durationSec != null && durationSec !== '') dto.durationSec = Number(durationSec);
-    if (rpe != null && rpe !== '') dto.rpe = Number(rpe);
-    if (notes) dto.notes = notes;
+  if (reps != null && reps !== '') dto.reps = Math.round(Number(reps));
+  if (weightKg != null && weightKg !== '') dto.weightKg = Number(weightKg);
+  if (durationSec != null && durationSec !== '') dto.durationSec = Number(durationSec);
+  if (rpe != null && rpe !== '') dto.rpe = Number(rpe);
+  if (notes) dto.notes = notes;
 
     if (!dto.reps && !dto.weightKg && !dto.durationSec) {
-      if (ex.measuresReps) dto.reps = 1;
-      else if (ex.measuresWeight) dto.weightKg = 0;
+      if (ex?.measuresReps) dto.reps = 1;
+      else if (ex?.measuresWeight) dto.weightKg = 0;
       else dto.durationSec = 0;
     }
 
-    try {
-      const res = await this.locationService.createRecord(dto);
-      this.dialogRef.close(res);
-    } catch (err) {
-      console.error('Failed to create record', err);
-      alert('Failed to create record');
-    }
+    this.locationService.createRecord(dto).subscribe({
+      next: (res) => this.dialogRef.close(res),
+      error: (err) => {
+        console.error('Failed to create record', err);
+        alert('Failed to create record');
+      }
+    });
   }
 
   close() { this.dialogRef.close(null); }

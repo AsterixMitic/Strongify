@@ -1,9 +1,8 @@
-/* Styles reused from user-update but scoped to the location dialog component */
+
 .update-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  /* allow the dialog to naturally size inside the overlay */
   min-height: auto;
   background: transparent;
   padding: 0.75rem;
@@ -19,7 +18,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  /* constrain height so dialog never exceeds viewport */
   max-height: 80vh;
   overflow: hidden;
 }
@@ -59,11 +57,9 @@
 .spinner { width:1rem; height:1rem; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.6s linear infinite }
 @keyframes spin { to { transform: rotate(360deg);} }
 
-/* Marker styles so dialog pin matches home map */
 .material-marker { display:inline-block; line-height:0; transform-origin:center bottom }
 .material-marker svg { filter: drop-shadow(0 4px 10px rgba(16,24,40,0.12)); transform:translateY(0) }
 
-/* Dialog map tweaks */
 #loc-dialog-map { border-radius: 8px; overflow: hidden; border:1px solid #e6edf3; box-shadow: 0 6px 18px rgba(12,15,30,0.04); height:220px }
 
 @media (max-width: 520px) {
@@ -71,7 +67,6 @@
   #loc-dialog-map { height:180px }
 }
 
-/* Resize uploader preview inside this dialog and ensure it fits nicely */
 ::ng-deep .uploader__preview img {
   width: 100%;
   max-height: 160px;
@@ -81,6 +76,5 @@
   margin: 0.4rem auto;
 }
 
-/* Tweak uploader actions inside dialog */
 ::ng-deep .uploader__actions { display:flex; gap:0.5rem; justify-content:flex-start }
 ::ng-deep .uploader__actions .btn { padding:0.5rem 0.85rem; font-size:0.9rem }

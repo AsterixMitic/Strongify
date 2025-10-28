@@ -14,11 +14,13 @@ export class LocationController {
   async create(@Req() req: Request, @Body() createLocationDto: CreateLocationDto) {
     try {
       const user = (req as any).user;
+      type CreateWithUser = CreateLocationDto & { user?: { id: number } };
+      const payload: CreateWithUser = { ...createLocationDto } as CreateWithUser;
       if (user && user.userId) {
         // attach ownership info server-side
-        (createLocationDto as any).user = { id: user.userId };
+        payload.user = { id: user.userId };
       }
-      return await this.locationService.create(createLocationDto);
+      return await this.locationService.create(payload);
     } catch (err) {
       console.error('Location create failed', err);
       throw err;

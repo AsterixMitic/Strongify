@@ -9,7 +9,7 @@ export class RealtimeGateway implements OnGatewayInit {
   server: Server;
 
   afterInit() {
-    // gateway initialized
+
   }
 
   emitRecordCreated(payload: any) {

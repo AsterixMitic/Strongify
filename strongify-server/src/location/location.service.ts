@@ -17,6 +17,7 @@ export class LocationService {
     return this.repo.save(location);
   }
 
+
   async findAll(): Promise<Location[]> {
     return this.repo.find();
   }

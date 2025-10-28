@@ -8,6 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { LocationService } from '../../core/services/location.service';
 import * as L from 'leaflet';
 import { ImageUploaderComponent } from '../../shared/components/image-uploader/image-uploader.component';
+import { of } from 'rxjs';
+import { switchMap, map, catchError, finalize } from 'rxjs/operators';
+import { CreateLocationDto, LocationDto } from '../../feature/location/data/location.dto';
 
 @Component({
   selector: 'app-location-dialog',
@@ -100,7 +103,7 @@ export class LocationDialogComponent implements AfterViewInit, OnDestroy {
     try { this.map.invalidateSize(); } catch (e) { /* ignore */ }
     [120, 300, 700].forEach(ms => setTimeout(() => { try { this.map?.invalidateSize(); } catch (e) { } }, ms));
 
-    this.map.on('click', (ev: any) => {
+    this.map.on('click', (ev: L.LeafletMouseEvent) => {
       const latlng = ev.latlng;
       const icon = this.createPinIcon();
       if (!this.marker) {
@@ -127,39 +130,58 @@ export class LocationDialogComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  async submit() {
+  submit() {
     if (!this.form.valid || !this.marker) return;
     const latlng = this.marker.getLatLng();
-    const dto: any = {
-      name: this.form.value.name,
-      description: this.form.value.description,
+    const dto: CreateLocationDto = {
+      name: String(this.form.value.name),
+      description: this.form.value.description ?? undefined,
       imageUrl: undefined,
       latitude: Number(latlng.lat),
       longitude: Number(latlng.lng)
     };
-    try {
-      this.loading = true;
-  const created: any = await this.locationService.createLocation(dto);
 
-      // if a file was selected, upload it and then patch the location with the public URL
-      if (this.selectedFile && created && created.id) {
-        try {
-          const uploadRes: any = await this.locationService.uploadLocationImage(created.id, this.selectedFile);
-          if (uploadRes && uploadRes.url) {
-            await this.locationService.updateLocation(created.id, { imageUrl: uploadRes.url });
-            (created as any).imageUrl = uploadRes.url;
-          }
-        } catch (uErr) {
-          console.warn('Image upload failed', uErr);
+    this.loading = true;
+
+    // create location -> optionally upload image -> optionally patch location with imageUrl
+    const create$ = this.locationService.createLocation(dto).pipe(
+      switchMap((created: LocationDto) => {
+        if (this.selectedFile && created && created.id) {
+          return this.locationService.uploadLocationImage(created.id, this.selectedFile).pipe(
+            switchMap((uploadRes: any) => {
+              const url = uploadRes?.url as string | undefined;
+              if (url) {
+                return this.locationService.updateLocation(created.id, { imageUrl: url }).pipe(
+                  map(() => ({ created, uploadRes: { url } }))
+                );
+              }
+              return of({ created, uploadRes: null });
+            }),
+            catchError(uErr => {
+              console.warn('Image upload failed', uErr);
+              return of({ created, uploadRes: null });
+            })
+          );
         }
-      }
-          this.loading = false;
+        return of({ created, uploadRes: null });
+      }),
+      finalize(() => this.loading = false),
+      catchError(err => {
+        console.error('Create location failed', err);
+        alert('Failed to create location');
+        return of(null);
+      })
+    );
 
+    create$.subscribe((res: { created: LocationDto; uploadRes?: { url?: string } | null } | null) => {
+      if (!res) return;
+      const created: LocationDto = res.created;
+      const uploadedUrl: string | undefined = res.uploadRes?.url;
+      if (uploadedUrl) {
+        created.imageUrl = uploadedUrl;
+      }
       this.dialogRef.close(created);
-    } catch (err) {
-      console.error('Create location failed', err);
-      alert('Failed to create location');
-    }
+    });
   }
 
   onFileSelected(file: File) {
