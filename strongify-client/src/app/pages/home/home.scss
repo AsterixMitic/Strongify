@@ -87,11 +87,19 @@
   }
 }
 
-.loading {
+.loading, .error-state {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+}
+
+.error-state {
+  p {
+    color: #e53e3e;
+    font-size: 1.125rem;
+    text-align: center;
+  }
 }
 
 .spinner {

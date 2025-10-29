@@ -3,10 +3,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { WorkoutRecordService } from './workout-record.service';
 import { CreateWorkoutRecordDto } from './dto/create-workout-record.dto';
 import { UpdateWorkoutRecordDto } from './dto/update-workout-record.dto';
+import { ExerciseTypeService } from 'src/exercise-type/exercise-type.service';
 
 @Controller('workout-record')
 export class WorkoutRecordController {
-  constructor(private readonly workoutRecordService: WorkoutRecordService) {}
+  constructor(private readonly workoutRecordService: WorkoutRecordService,
+    private readonly exerciseTypeService: ExerciseTypeService
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
@@ -25,6 +28,18 @@ export class WorkoutRecordController {
   @Get()
   findAll() {
     return this.workoutRecordService.findAll();
+  }
+
+  @Get('stats/top/:exerciseType/:pageNum')
+  async findBestRecordsByExerciseType(
+    @Param('exerciseType') exerciseType: string,
+    @Param('pageNum') pageNum: number,
+  ) {
+    const exercise = await this.exerciseTypeService.findOne(exerciseType);
+    return this.workoutRecordService.findBestRecordsByExerciseType(
+      exercise,
+      pageNum,
+    );
   }
 
   @Get(':id')

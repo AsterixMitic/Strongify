@@ -5,15 +5,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WorkoutRecord } from './workout-record.entity';
 import { Repository } from 'typeorm';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
+import { BaseService } from 'src/common/services/base.service';
+import { ExerciseType } from 'src/exercise-type/exercise-type.entity';
 
 @Injectable()
-export class WorkoutRecordService {
+export class WorkoutRecordService extends BaseService<WorkoutRecord> {
   
     constructor(
       @InjectRepository(WorkoutRecord)
       private repo: Repository<WorkoutRecord>,
       private realtime: RealtimeGateway
       ){
+        super(repo);
     }
   
   //! ovo ne valja, proveri
@@ -54,6 +57,35 @@ export class WorkoutRecordService {
     async remove(id: string): Promise<void> {
       const workoutRecord = await this.findOne(id);
       await this.repo.remove(workoutRecord);
+    }
+
+    async findBestRecordsByExerciseType(exerciseType: ExerciseType, pageNum: number): Promise<WorkoutRecord[]> {
+
+      let valueField = '';
+      if(exerciseType.measuresTime){
+        valueField = 'durationSec';
+      }
+      else if(exerciseType.measuresWeight){
+        valueField = 'weightKg';
+      }
+      else if(exerciseType.measuresReps){
+        valueField = 'reps';
+      }
+
+      const qb = this.repo.createQueryBuilder('workoutRecord')
+          .where('workoutRecord.exercise_type_id = :exerciseTypeId', { exerciseTypeId: exerciseType.id })
+          .leftJoinAndSelect('workoutRecord.exerciseType', 'exerciseType')
+          .leftJoinAndSelect('workoutRecord.user', 'user')
+          .leftJoinAndSelect('workoutRecord.location', 'location');
+
+      this.applyPagination(qb, {
+        page: pageNum,
+        limit: 10,
+        orderBy: valueField,
+        orderDirection: 'DESC',
+      });
+      const [entities, total] = await qb.getManyAndCount();
+      return entities;
     }
   
 }

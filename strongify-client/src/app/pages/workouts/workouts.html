@@ -1,0 +1,81 @@
+<div class="workouts-container">
+  <div class="content">
+    <div class="header">
+      <h1>Workout Progress</h1>
+      <p class="subtitle">Track your progress across different exercises</p>
+    </div>
+
+    @if (loading()) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      @if (availableExercises().length > 0) {
+        <div class="filter-section">
+          <div class="filter-header">
+            <h3>Filter Exercises</h3>
+            <button class="btn-show-all" (click)="selectAll()">Show All</button>
+          </div>
+          <div class="exercise-filters">
+            @for (exercise of availableExercises(); track exercise.id) {
+              <button 
+                class="filter-chip"
+                [class.active]="isExerciseSelected(exercise.id)"
+                (click)="toggleExercise(exercise.id)"
+              >
+                {{ exercise.name }}
+                <span class="chip-count">{{ exercise.count }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="exercise-grid">
+        @for (progress of exerciseProgress(); track progress.exerciseType.id) {
+          <div class="exercise-card">
+            <div class="exercise-header">
+              <h3>{{ progress.exerciseType.name }}</h3>
+              <div class="workout-count">{{ progress.totalWorkouts }} workouts</div>
+            </div>
+            
+            @if (progress.exerciseType.description) {
+              <!-- <p class="exercise-description">{{ progress.exerciseType.description }}</p> -->
+            }
+
+            @for (chartData of progress.charts; track chartData.type) {
+              <div class="chart-section">
+                <div class="chart-header">
+                  <h4>{{ chartData.label }}</h4>
+                  <div class="chart-stats">
+                    <div class="chart-stat">
+                      <span class="chart-stat-label">Latest</span>
+                      <span class="chart-stat-value">{{ chartData.latestValue }}</span>
+                    </div>
+                    <div class="chart-stat">
+                      <span class="chart-stat-label">Best</span>
+                      <span class="chart-stat-value">{{ chartData.maxValue }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="chart-container">
+                  <!-- ADDED: #chartCanvas and data-key -->
+                  <canvas
+                    #chartCanvas
+                    [attr.data-key]="progress.exerciseType.id + '-' + chartData.type"
+                    [id]="'chart-' + progress.exerciseType.id + '-' + chartData.type">
+                  </canvas>
+                </div>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="empty-state">
+            <p>No workout data yet. Start tracking your progress!</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

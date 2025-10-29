@@ -1,7 +1,7 @@
 import { Component, inject, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { LocationService } from '../../core/services/location.service';
+import { LocationService } from '../../feature/location/data/location.service';
 import { firstValueFrom, zip, Subscription } from 'rxjs';
 import { LocationDto, ExerciseTypeDto } from '../../feature/location/data/location.dto';
 import { WorkoutRecordDto } from '../../feature/workout-record/data/workout-record.dto';

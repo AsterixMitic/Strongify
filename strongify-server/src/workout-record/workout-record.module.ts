@@ -4,9 +4,10 @@ import { WorkoutRecordController } from './workout-record.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutRecord } from './workout-record.entity';
 import { RealtimeGateway } from 'src/realtime/realtime.gateway';
+import { ExerciseTypeModule } from 'src/exercise-type/exercise-type.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WorkoutRecord])],
+  imports: [TypeOrmModule.forFeature([WorkoutRecord]), ExerciseTypeModule],
   controllers: [WorkoutRecordController],
   providers: [WorkoutRecordService, RealtimeGateway],
   exports: [WorkoutRecordService],

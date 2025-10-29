@@ -1,33 +1,38 @@
-<div *ngIf="user() as currentUser; else loading" class="home-container">
-  <main class="main">
-    <div class="welcome">
-      <h2>Welcome back</h2>
-      <p>Ready to get started?</p>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="number">{{ currentUser.workoutRecords.length }}</div>
-        <div class="label">Workouts</div>
-      </div>
-      <div class="stat">
-        <div class="number">0</div>
-        <div class="label">Streak</div>
-      </div>
-      <div class="stat">
-        <div class="number">0</div>
-        <div class="label">Points</div>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn-primary">Start Workout</button>
-      <button class="btn-secondary">View Progress</button>
-    </div>
-  </main>
-</div>
-<ng-template #loading>
+@if (authStatus() === 'loading') {
   <div class="loading">
     <div class="spinner"></div>
   </div>
-</ng-template>
+} @else if (authStatus() === 'authenticated' && user()) {
+  <div class="home-container">
+    <main class="main">
+      <div class="welcome">
+        <h2>Welcome back</h2>
+        <p>Ready to get started?</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="number">{{ user()!.workoutRecords.length || 0 }}</div>
+          <div class="label">Workouts</div>
+        </div>
+        <div class="stat">
+          <div class="number">0</div>
+          <div class="label">Streak</div>
+        </div>
+        <div class="stat">
+          <div class="number">0</div>
+          <div class="label">Points</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary">Start Workout</button>
+        <button class="btn-secondary">View Progress</button>
+      </div>
+    </main>
+  </div>
+} @else {
+  <div class="error-state">
+    <p>Failed to load user data. Please try refreshing the page.</p>
+  </div>
+}

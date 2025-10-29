@@ -1,0 +1,110 @@
+<div class="records-container">
+  <div class="content">
+    <div class="header">
+      <h1>Workout Records</h1>
+      <p class="subtitle">Top performances by exercise type</p>
+    </div>
+
+    @if (loading()) {
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    } @else {
+      <!-- Exercise Type Selector -->
+      <div class="exercise-selector">
+        <h3>Select Exercise Type</h3>
+        <div class="exercise-tabs">
+          @for (exerciseType of exerciseTypes(); track exerciseType.id) {
+            <button 
+              class="exercise-tab"
+              [class.active]="selectedExerciseType()?.id === exerciseType.id"
+              (click)="selectExerciseType(exerciseType)"
+            >
+              {{ exerciseType.name }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Records List with Infinite Scroll -->
+      @if (selectedExerciseType()) {
+        <div class="records-section">
+          <div class="section-header">
+            <h2>{{ selectedExerciseType()!.name }} Records</h2>
+            <span class="record-count">{{ records().length }} records loaded</span>
+          </div>
+
+          <div class="records-list" (scroll)="onScroll($event)">
+            @if (records().length > 0) {
+              @for (record of records(); track record.id; let i = $index) {
+                <div class="record-card" (click)="openRecordModal(record, i + 1)">
+                  <div class="record-rank">{{ i + 1 }}</div>
+                  <div class="record-details">
+                    <div class="record-info">
+                      @if (record.reps) {
+                        <div class="record-stat">
+                          <span class="stat-label">Reps:</span>
+                          <span class="stat-value highlight">{{ record.reps }}</span>
+                        </div>
+                      }
+                      @if (record.weightKg) {
+                        <div class="record-stat">
+                          <span class="stat-label">Weight:</span>
+                          <span class="stat-value highlight">{{ record.weightKg }} kg</span>
+                        </div>
+                      }
+                      @if (record.durationSec) {
+                        <div class="record-stat">
+                          <span class="stat-label">Duration:</span>
+                          <span class="stat-value highlight">{{ record.durationSec }} sec</span>
+                        </div>
+                      }
+                      @if (record.user) {
+                        <div class="record-stat">
+                          <span class="stat-label">User:</span>
+                          <span class="stat-value">{{ record.user.username }}</span>
+                        </div>
+                      }
+                    </div>
+                    @if (record.createdAt) {
+                      <div class="record-date">
+                        {{ record.createdAt | date:'medium' }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              
+              @if (loadingMore()) {
+                <div class="loading-more">
+                  <div class="spinner-small"></div>
+                  <span>Loading more records...</span>
+                </div>
+              } @else if (!hasMorePages() && records().length > 0) {
+                <div class="no-more-records">
+                  <p>All records loaded</p>
+                </div>
+              }
+            } @else {
+              <div class="empty-records">
+                <p>No records found for this exercise type.</p>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="no-selection">
+          <p>Select an exercise type to view records</p>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Record Detail Modal -->
+<app-record-modal 
+  [record]="selectedRecord()" 
+  [rank]="selectedRecordRank()"
+  (close)="closeRecordModal()">
+</app-record-modal>
+

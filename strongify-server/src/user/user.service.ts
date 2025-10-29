@@ -36,7 +36,7 @@ export class UserService extends BaseService<User> {
   }
 
   async findOne(id: string): Promise<FullUserDto | null> {
-    const user = await this.repo.findOne({ where: { id }, relations: ['workoutRecords'] });
+    const user = await this.repo.findOne({ where: { id }, relations: ['workoutRecords', 'workoutRecords.exerciseType'] });
     return user ? new FullUserDto(user) : null;
   }
 

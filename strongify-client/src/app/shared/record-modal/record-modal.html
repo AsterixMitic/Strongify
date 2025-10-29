@@ -1,0 +1,112 @@
+@if (isOpen() && record) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="header-content">
+          @if (rank) {
+            <div class="modal-rank">
+              <span class="rank-icon">🏆</span>
+              <span class="rank-number">#{{ rank }}</span>
+            </div>
+          }
+          <h2>Workout Record Details</h2>
+        </div>
+        <button class="close-button" (click)="closeModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Exercise Type Info -->
+        @if (record.exerciseType) {
+          <div class="info-section">
+            <h3>Exercise</h3>
+            <div class="info-card highlight">
+              <div class="card-icon">💪</div>
+              <div class="card-content">
+                <div class="card-title">{{ record.exerciseType.name }}</div>
+                @if (record.exerciseType.description) {
+                  <div class="card-subtitle">{{ record.exerciseType.description }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Performance Metrics -->
+        <div class="info-section">
+          <h3>Performance</h3>
+          <div class="metrics-grid">
+            @if (record.reps) {
+              <div class="metric-card">
+                <div class="metric-value">{{ record.reps }}</div>
+                <div class="metric-label">Repetitions</div>
+              </div>
+            }
+            @if (record.weightKg) {
+              <div class="metric-card">
+                <div class="metric-value">{{ record.weightKg }} kg</div>
+                <div class="metric-label">Weight</div>
+              </div>
+            }
+            @if (record.durationSec) {
+              <div class="metric-card">
+                <div class="metric-icon">⏱️</div>
+                <div class="metric-value">{{ record.durationSec }} sec</div>
+                <div class="metric-label">Duration</div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- User Info -->
+        @if (record.user) {
+          <div class="info-section">
+            <h3>Athlete</h3>
+            <div class="info-card">
+              <div class="card-icon">👤</div>
+              <div class="card-content">
+                <div class="card-title">{{ record.user.username }}</div>
+                @if (record.user.email) {
+                  <div class="card-subtitle">{{ record.user.email }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Location Info -->
+        @if (record.location) {
+          <div class="info-section">
+            <h3>Location</h3>
+            <div class="info-card">
+              <div class="card-icon">📍</div>
+              <div class="card-content">
+                <div class="card-title">{{ record.location.name }}</div>
+                @if (record.location.description) {
+                  <div class="card-subtitle">{{ record.location.description }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Date Info -->
+        <div class="info-section">
+          <h3>Recorded</h3>
+          <div class="info-card">
+            <div class="card-icon">📅</div>
+            <div class="card-content">
+              <div class="card-title">{{ formatDate(record.createdAt) }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-close" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+

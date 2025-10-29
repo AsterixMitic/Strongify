@@ -6,6 +6,8 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Profile } from './pages/user/profile/profile';
 import { UserUpdate } from './pages/user/user-update/user-update';
 import { Locations } from './pages/locations/locations';
+import { Workouts } from './pages/workouts/workouts';
+import { Records } from './pages/records/records';
 import { authGuard, redirectLoggedInToApp, redirectLoggedInFromDashboard, matchAuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -32,6 +34,16 @@ export const routes: Routes = [
   {
     path: 'locations',
     component: Locations,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'workouts',
+    component: Workouts,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'records',
+    component: Records,
     canActivate: [authGuard]
   },
   {
