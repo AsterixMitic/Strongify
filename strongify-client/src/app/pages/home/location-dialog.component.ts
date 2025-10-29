@@ -5,7 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { LocationService } from '../../feature/location/data/location.service';
+import { LocationService } from '../../feature/location/location.service';
 import * as L from 'leaflet';
 import { ImageUploaderComponent } from '../../shared/components/image-uploader/image-uploader.component';
 import { of } from 'rxjs';

@@ -3,13 +3,13 @@ import { WorkoutRecordService } from './workout-record.service';
 import { WorkoutRecordController } from './workout-record.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkoutRecord } from './workout-record.entity';
-import { RealtimeGateway } from 'src/realtime/realtime.gateway';
+import { RealtimeModule } from 'src/realtime/realtime.module';
 import { ExerciseTypeModule } from 'src/exercise-type/exercise-type.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WorkoutRecord]), ExerciseTypeModule],
+  imports: [TypeOrmModule.forFeature([WorkoutRecord]), ExerciseTypeModule, RealtimeModule],
   controllers: [WorkoutRecordController],
-  providers: [WorkoutRecordService, RealtimeGateway],
+  providers: [WorkoutRecordService],
   exports: [WorkoutRecordService],
 })
 export class WorkoutRecordModule {}

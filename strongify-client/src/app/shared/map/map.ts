@@ -1,13 +1,12 @@
 import { Component, inject, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
-import { LocationService } from '../../feature/location/data/location.service';
+import { LocationService } from '../../feature/location/location.service';
 import { firstValueFrom, zip, Subscription } from 'rxjs';
 import { LocationDto, ExerciseTypeDto } from '../../feature/location/data/location.dto';
 import { WorkoutRecordDto } from '../../feature/workout-record/data/workout-record.dto';
-import { environment } from '../../../environment/environment';
+import { RealtimeService, RecordCreatedEvent } from '../../core/services/realtime.service';
 import * as L from 'leaflet';
-import { io, Socket } from 'socket.io-client';
 
 type NormalizedRecord = Partial<WorkoutRecordDto> & { exercise?: string; value?: number | undefined; createdAt?: string | undefined; locationId?: string; reps?: number; weightKg?: number; durationSec?: number; exerciseType?: { name?: string } };
 
@@ -27,51 +26,56 @@ L.Icon.Default.mergeOptions({
 export class MapComponent implements AfterViewInit, OnDestroy {
   private locationService = inject(LocationService);
   private dialog = inject(MatDialog);
+  private realtimeService = inject(RealtimeService);
 
   private markers: Record<string, L.Marker> = {};
   private records: Record<string, NormalizedRecord | null> = {};
   private map: L.Map | null = null;
-  private socket: Socket | null = null;
   private exerciseTypes: ExerciseTypeDto[] = [];
   private recordsSub: Subscription | null = null;
+  private realtimeSub: Subscription | null = null;
+  private locations: LocationDto[] = [];
 
   async ngAfterViewInit() {
     setTimeout(() => this.setupMap(), 0);
     document.addEventListener('click', this.onDocumentClick);
 
-    try {
-      this.socket = io(environment.apiUrl);
-      this.socket.on('record.created', (payload: any) => {
-        const locId = payload?.location?.id || payload?.locationId || payload?.location_id || null;
-        if (locId) {
-          const normalized: NormalizedRecord = {
-            id: payload?.id,
-            userId: payload?.userId,
-            locationId: locId,
-            exercise: payload?.exerciseType?.name ?? payload?.exercise ?? '',
-            reps: payload?.reps,
-            weightKg: payload?.weightKg,
-            durationSec: payload?.durationSec,
-            value: payload?.value ?? payload?.reps ?? payload?.weightKg ?? payload?.durationSec ?? undefined,
-            createdAt: payload?.createdAt
-          };
-          this.records[locId] = normalized;
-          const marker = this.markers[locId];
-          if (marker) {
-            const popup = marker.getPopup();
-            if (popup) {
-              const newText = `${payload.exerciseType?.name || payload.exercise || ''}: ${payload.value ?? payload.reps ?? payload.weightKg ?? ''}`;
-              const oldHtml = popup.getContent();
-              if (typeof oldHtml === 'string') {
-                const newHtml = oldHtml.replace(/<span data-loc-record>.*?<\/span>/, `<span data-loc-record>${newText}</span>`);
-                popup.setContent(newHtml);
-              }
-            }
-          }
+    // Subscribe to real-time record created events
+    this.realtimeSub = this.realtimeService.recordCreated$.subscribe((event: RecordCreatedEvent) => {
+      this.handleRecordCreated(event);
+    });
+  }
+
+  private handleRecordCreated(event: RecordCreatedEvent) {
+    const locId = event.locationId;
+    if (!locId) return;
+
+    // Update records cache
+    const normalized: NormalizedRecord = {
+      id: event.id,
+      userId: event.userId,
+      locationId: locId,
+      exercise: event.exercise,
+      reps: event.reps,
+      weightKg: event.weightKg,
+      durationSec: event.durationSec,
+      value: event.value,
+      createdAt: event.createdAt
+    };
+    this.records[locId] = normalized;
+
+    // Update map marker popup
+    const marker = this.markers[locId];
+    if (marker) {
+      const popup = marker.getPopup();
+      if (popup) {
+        const newText = `${event.exercise}: ${event.value ?? ''}`;
+        const oldHtml = popup.getContent();
+        if (typeof oldHtml === 'string') {
+          const newHtml = oldHtml.replace(/<span data-loc-record>.*?<\/span>/, `<span data-loc-record>${newText}</span>`);
+          popup.setContent(newHtml);
         }
-      });
-    } catch (err) {
-      console.warn('Socket connect failed', err);
+      }
     }
   }
 
@@ -85,13 +89,13 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     document.removeEventListener('click', this.onDocumentClick);
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
-    }
     if (this.recordsSub) {
       this.recordsSub.unsubscribe();
       this.recordsSub = null;
+    }
+    if (this.realtimeSub) {
+      this.realtimeSub.unsubscribe();
+      this.realtimeSub = null;
     }
   }
 
@@ -117,6 +121,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
           this.locationService.getRecords()
         ).subscribe({
           next: ([locations, exerciseTypes, records]) => {
+            this.locations = locations;
             const defaultIcon = this.createPinIcon();
             locations.forEach((loc: LocationDto) => {
               const marker = L.marker([loc.latitude, loc.longitude], { icon: defaultIcon, riseOnHover: true }).addTo(map);

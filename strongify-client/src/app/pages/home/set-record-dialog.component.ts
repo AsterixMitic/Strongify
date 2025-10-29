@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { LocationService } from '../../feature/location/data/location.service';
+import { LocationService } from '../../feature/location/location.service';
 import { ExerciseTypeDto, CreateRecordDto } from '../../feature/location/data/location.dto';
 
 export interface SetRecordDialogData {

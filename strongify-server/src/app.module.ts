@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RealtimeGateway } from './realtime/realtime.gateway';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm'
 import { UserModule } from './user/user.module';
@@ -16,6 +15,7 @@ import { ExerciseType } from './exercise-type/exercise-type.entity';
 import { LeaderboardEntry } from './leaderboard-entry/leaderboard-entry.entity';
 import { AuthModule } from './auth/auth.module';
 import { StorageModule } from './storage/storage.module';
+import { RealtimeModule } from './realtime/realtime.module';
 
 @Module({
   imports: [
@@ -25,8 +25,7 @@ import { StorageModule } from './storage/storage.module';
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         host: config.get<string>('DB_HOST')!,
-        port: +
-        config.get<string>('DB_PORT')!,
+        port: +config.get<string>('DB_PORT')!,
         username: config.get<string>('DB_USERNAME')!,
         password: config.get<string>('DB_PASSWORD')!,
         database: config.get<string>('DB_DATABASE')!,
@@ -41,7 +40,8 @@ import { StorageModule } from './storage/storage.module';
     ExerciseTypeModule,
     LeaderboardEntryModule,
     AuthModule,
-    StorageModule
+    StorageModule,
+    RealtimeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

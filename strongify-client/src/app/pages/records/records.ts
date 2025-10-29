@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { selectUser } from '../../core/auth/state/auth.selectors';
-import { LocationService } from '../../feature/location/data/location.service';
+import { LocationService } from '../../feature/location/location.service';
 import { WorkoutRecordService } from '../../feature/workout-record/workout-record.service';
 import { ExerciseTypeDto } from '../../feature/location/data/location.dto';
 import { WorkoutRecordDto } from '../../feature/workout-record/data/workout-record.dto';

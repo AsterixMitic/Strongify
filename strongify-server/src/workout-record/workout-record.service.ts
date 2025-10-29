@@ -20,12 +20,22 @@ export class WorkoutRecordService extends BaseService<WorkoutRecord> {
     }
   
   //! ovo ne valja, proveri
-    async create(createWorkoutRecordDto: CreateWorkoutRecordDto & { user?: { id: number } }): Promise<WorkoutRecord[]> {
+    async create(createWorkoutRecordDto: CreateWorkoutRecordDto & { user?: { id: number } }): Promise<WorkoutRecord> {
       const workoutRecord = this.repo.create(createWorkoutRecordDto as any);
-      const saved = await this.repo.save(workoutRecord);
+      const saved = await this.repo.save(workoutRecord) as unknown as WorkoutRecord;
+      
+      // Load full relations for realtime event
+      const fullRecord = await this.repo.findOne({
+        where: { id: saved.id },
+        relations: ['user', 'location', 'exerciseType']
+      });
+      
       // emit realtime event for other clients
       try {
-        this.realtime.emitRecordCreated(saved);
+        if (fullRecord) {
+          this.realtime.emitRecordCreated(fullRecord);
+          console.log('Emitted record with full relations:', fullRecord);
+        }
       } catch (err) {
         // don't block on realtime errors
         console.warn('Realtime emit failed', err);

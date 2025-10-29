@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/operators';
-import { environment } from '../../../../environment/environment';
-import { LocationDto, CreateLocationDto, UpdateLocationDto, ExerciseTypeDto, CreateRecordDto } from './location.dto';
-import { WorkoutRecordDto } from '../../workout-record/data/workout-record.dto';
+import { environment } from '../../../environment/environment';
+import { LocationDto, CreateLocationDto, UpdateLocationDto, ExerciseTypeDto, CreateRecordDto } from './data/location.dto';
+import { WorkoutRecordDto } from '../workout-record/data/workout-record.dto';
 
 @Injectable({ providedIn: 'root' })
 export class LocationService {
