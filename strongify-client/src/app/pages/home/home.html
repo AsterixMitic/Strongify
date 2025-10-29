@@ -1,44 +1,33 @@
-@if (user(); as currentUser) {
-  <div class="home-container">
+<div *ngIf="user() as currentUser; else loading" class="home-container">
+  <main class="main">
+    <div class="welcome">
+      <h2>Welcome back</h2>
+      <p>Ready to get started?</p>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main">
-      <!-- Map -->
-      <section class="map-section">
-        <div id="home-map" class="map-container"></div>
-      </section>
-
-      <div class="welcome">
-        <h2>Welcome back</h2>
-        <p>Ready to get started?</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="number">{{ currentUser.workoutRecords.length }}</div>
+        <div class="label">Workouts</div>
       </div>
-
-      <!-- Simple Stats -->
-      <div class="stats">
-        <div class="stat">
-          <div class="number">0</div>
-          <div class="label">Workouts</div>
-        </div>
-        <div class="stat">
-          <div class="number">0</div>
-          <div class="label">Streak</div>
-        </div>
-        <div class="stat">
-          <div class="number">0</div>
-          <div class="label">Points</div>
-        </div>
+      <div class="stat">
+        <div class="number">0</div>
+        <div class="label">Streak</div>
       </div>
-
-      <!-- Actions -->
-      <div class="actions">
-        <button class="btn-primary">Start Workout</button>
-        <button class="btn-secondary">View Progress</button>
-        <button class="btn-tertiary" (click)="openAddLocationDialog()">Add location</button>
+      <div class="stat">
+        <div class="number">0</div>
+        <div class="label">Points</div>
       </div>
-    </main>
-  </div>
-} @else {
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary">Start Workout</button>
+      <button class="btn-secondary">View Progress</button>
+    </div>
+  </main>
+</div>
+<ng-template #loading>
   <div class="loading">
     <div class="spinner"></div>
   </div>
-}
+</ng-template>

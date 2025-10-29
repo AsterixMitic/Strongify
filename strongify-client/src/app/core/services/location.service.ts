@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { timeout } from 'rxjs/operators';
 import { environment } from '../../../environment/environment';
 import { LocationDto, CreateLocationDto, UpdateLocationDto, ExerciseTypeDto, CreateRecordDto } from '../../feature/location/data/location.dto';
-import { WorkoutRecordDto } from '../../feature/location/data/workout-record.dto';
+import { WorkoutRecordDto } from '../../feature/workout-record/data/workout-record.dto';
 
 @Injectable({ providedIn: 'root' })
 export class LocationService {

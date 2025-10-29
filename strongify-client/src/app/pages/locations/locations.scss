@@ -1,0 +1,17 @@
+.locations-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem 2rem;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
+

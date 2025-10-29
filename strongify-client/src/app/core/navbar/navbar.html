@@ -7,6 +7,7 @@
     <div class="navbar-links">
       @if (isAuthenticated()) {
         <a routerLink="/home" class="nav-link">Home</a>
+        <a routerLink="/locations" class="nav-link">Locations</a>
         <a routerLink="/user/profile" class="nav-link">Profile</a>
         <button (click)="logout()" class="nav-link logout-btn">Logout</button>
       } @else {

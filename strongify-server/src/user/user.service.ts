@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 import { FullUserDto } from './dto/full-user.dto';
 import { BaseService } from 'src/common/services/base.service';
 import { UserNotFoundException } from 'src/common/exceptions/business.exceptions';
+import { WorkoutRecord } from 'src/workout-record/workout-record.entity';
+import { BaseUserDto } from './dto/base-user.dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -28,13 +30,13 @@ export class UserService extends BaseService<User> {
     return new FullUserDto(user);
   }
 
-  async findAll(): Promise<FullUserDto[]> {
+  async findAll(): Promise<BaseUserDto[]> {
     const users = await this.repo.find();
-    return users.map((user) => new FullUserDto(user));
+    return users.map((user) => new BaseUserDto(user));
   }
 
   async findOne(id: string): Promise<FullUserDto | null> {
-    const user = await this.repo.findOne({ where: { id } });
+    const user = await this.repo.findOne({ where: { id }, relations: ['workoutRecords'] });
     return user ? new FullUserDto(user) : null;
   }
 

@@ -5,6 +5,7 @@ import { Home } from './pages/home/home';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Profile } from './pages/user/profile/profile';
 import { UserUpdate } from './pages/user/user-update/user-update';
+import { Locations } from './pages/locations/locations';
 import { authGuard, redirectLoggedInToApp, redirectLoggedInFromDashboard, matchAuthGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -26,6 +27,11 @@ export const routes: Routes = [
   {
     path: 'home',
     component: Home,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'locations',
+    component: Locations,
     canActivate: [authGuard]
   },
   {

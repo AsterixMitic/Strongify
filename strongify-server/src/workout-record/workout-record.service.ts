@@ -16,8 +16,8 @@ export class WorkoutRecordService {
       ){
     }
   
-  
-    async create(createWorkoutRecordDto: CreateWorkoutRecordDto & { user?: { id: number } }): Promise<WorkoutRecord> {
+  //! ovo ne valja, proveri
+    async create(createWorkoutRecordDto: CreateWorkoutRecordDto & { user?: { id: number } }): Promise<WorkoutRecord[]> {
       const workoutRecord = this.repo.create(createWorkoutRecordDto as any);
       const saved = await this.repo.save(workoutRecord);
       // emit realtime event for other clients
