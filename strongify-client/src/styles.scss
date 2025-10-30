@@ -38,56 +38,32 @@ html, body {
   .leaflet-popup-content .loc-popup .img-wrap img { width: 100%; height: auto; object-fit: cover; max-width: 100% }
 }
 
-// Notification styles
-.notification-success {
-  .mat-mdc-snack-bar-container {
-    --mdc-snackbar-container-color: #4caf50;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
+.white-select-panel {
+  background: #fff !important;
+  color: rgba(0,0,0,0.87) !important;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(2,6,23,0.18);
+  padding: 4px 0;
+  z-index: 10000 !important; 
+}
+.white-select-panel .mat-option {
+  background: transparent !important;
+  color: rgba(0,0,0,0.87) !important;
+  padding: 8px 16px !important;
+}
+.white-select-panel .mat-option.mat-selected {
+  background: #e6f0ff !important; 
+}
+.white-select-panel .mat-option:hover {
+  background: #f2f8ff !important;
+}
+.white-select-panel .mat-option.mat-active {
+  outline: 2px solid rgba(59,130,246,0.18);
 }
 
-.notification-info {
-  .mat-mdc-snack-bar-container {
-    --mdc-snackbar-container-color: #2196f3;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
+.white-select-panel .mat-option:focus {
+  background: #eef6ff !important;
 }
 
-.notification-warning {
-  .mat-mdc-snack-bar-container {
-    --mdc-snackbar-container-color: #ff9800;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
-}
-
-.notification-error {
-  .mat-mdc-snack-bar-container {
-    --mdc-snackbar-container-color: #f44336;
-    --mat-mdc-snack-bar-button-color: #fff;
-    --mdc-snackbar-supporting-text-color: #fff;
-  }
-}
-
-// Record notification dialog styles
-.record-notification-dialog-panel {
-  .mat-mdc-dialog-container {
-    padding: 0;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-  }
-
-  .mat-mdc-dialog-surface {
-    border-radius: 16px;
-    overflow: hidden;
-  }
-}
-
-// Backdrop animation
-.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
-  backdrop-filter: blur(4px);
-  background-color: rgba(0, 0, 0, 0.4);
-}
+.white-select-panel::-webkit-scrollbar { width: 8px; }
+.white-select-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 4px; }

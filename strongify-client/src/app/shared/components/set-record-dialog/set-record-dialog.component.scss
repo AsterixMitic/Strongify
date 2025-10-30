@@ -1,0 +1,53 @@
+.set-record-dialog {
+  display: block;
+  min-width: 320px;
+
+  .mat-form-field {
+    width: 100%;
+    background: #fff; /* make inputs/select look clear on colored dialogs */
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+
+  /* visually distinguish disabled fields */
+  .mat-form-field.mat-form-field-disabled {
+    .mat-form-field-infix {
+      background: #f3f4f6; /* light gray */
+      color: rgba(0,0,0,0.6);
+    }
+    .mat-input-element {
+      color: rgba(0,0,0,0.5);
+    }
+  }
+
+  .controls-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .control-field {
+    flex: 1 1 140px;
+    min-width: 120px;
+  }
+
+  .mat-form-field .mat-select-trigger {
+    display: flex;
+    align-items: center;
+    height: 36px;
+  }
+  .mat-form-field .mat-select-value {
+    color: rgba(0,0,0,0.87);
+  }
+
+  /* slightly bolder label for clarity */
+  .mat-form-field .mat-form-field-label {
+    color: rgba(0,0,0,0.7);
+    font-weight: 600;
+  }
+
+  textarea.mat-input-element {
+    min-height: 80px;
+  }
+}

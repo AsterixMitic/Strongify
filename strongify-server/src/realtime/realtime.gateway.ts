@@ -18,27 +18,27 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   server: Server;
 
   afterInit(server: Server): void {
-    console.log('✅ RealtimeGateway initialized');
-    console.log('📍 WebSocket server path:', server.path());
+    console.log('RealtimeGateway initialized');
+    console.log('WebSocket server path:', server.path());
   }
 
   handleConnection(client: Socket): void {
-    console.log('🔌 Client connected:', client.id);
-    console.log('   Total clients:', this.server.sockets.sockets.size);
+    console.log('Client connected:', client.id);
+    console.log('Total clients:', this.server.sockets.sockets.size);
   }
 
   handleDisconnect(client: Socket): void {
-    console.log('❌ Client disconnected:', client.id);
-    console.log('   Total clients:', this.server.sockets.sockets.size);
+    console.log('Client disconnected:', client.id);
+    console.log('Total clients:', this.server.sockets.sockets.size);
   }
 
   emitRecordCreated(payload: any) {
     if (this.server) {
-      console.log('📡 Broadcasting record.created event to', this.server.sockets.sockets.size, 'clients');
-      console.log('   Payload:', JSON.stringify(payload, null, 2));
+      console.log('Broadcasting record.created event to', this.server.sockets.sockets.size, 'clients');
+      console.log('Payload:', JSON.stringify(payload, null, 2));
       this.server.emit('record.created', payload);
     } else {
-      console.warn('⚠️ WebSocket server not initialized yet');
+      console.warn('WebSocket server not initialized yet');
     }
   }
 }

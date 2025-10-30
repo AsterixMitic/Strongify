@@ -30,10 +30,10 @@ export class App implements OnInit, OnDestroy {
     // Connect to WebSocket when user is authenticated
     this.authSub = this.store.select(selectIsAuth).subscribe((isAuth) => {
       if (isAuth) {
-        console.log('🔐 User authenticated, connecting WebSocket...');
+        console.log('User authenticated, connecting WebSocket...');
         this.wsService.connect();
       } else {
-        console.log('🔐 User not authenticated, disconnecting WebSocket...');
+        console.log('User not authenticated, disconnecting WebSocket...');
         this.wsService.disconnect();
       }
     });
@@ -42,7 +42,7 @@ export class App implements OnInit, OnDestroy {
   private setupWebSocketListeners() {
     // Listen for record.created events from WebSocket
     this.wsService.on('record.created', (payload: any) => {
-      console.log('📨 Received record.created event:', payload);
+      console.log('Received record.created event:', payload);
       
       // Broadcast to all components via RealtimeService
       this.realtimeService.emitRecordCreated(payload);

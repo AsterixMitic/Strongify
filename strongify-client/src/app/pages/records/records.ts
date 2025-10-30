@@ -42,9 +42,8 @@ export class Records implements OnInit {
       
       console.log('Loading records for exercise:', exerciseId);
       
-      // Reset page counter when exercise type changes
       return this.pageRequests$.pipe(
-        startWith(1), // Start with page 1
+        startWith(1), 
         concatMap(page => {
           console.log(`Loading page ${page} for exercise ${exerciseId}`);
           return this.workoutRecordService.getTopRecordsByExerciseType(exerciseId, page).pipe(
@@ -57,7 +56,6 @@ export class Records implements OnInit {
         scan((all, pageData) => {
           console.log('Received page data:', pageData);
           
-          // Check if we've reached the end (no more records or less than page size)
           if (pageData.length === 0 || pageData.length < 10) {
             this.hasMorePages.set(false);
             console.log('No more pages to load');

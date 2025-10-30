@@ -5,12 +5,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { LocationService } from '../../feature/location/location.service';
+import { LocationService } from '../../../feature/location/location.service';
 import * as L from 'leaflet';
-import { ImageUploaderComponent } from '../../shared/components/image-uploader/image-uploader.component';
+import { ImageUploaderComponent } from '../image-uploader/image-uploader.component';
 import { of } from 'rxjs';
 import { switchMap, map, catchError, finalize } from 'rxjs/operators';
-import { CreateLocationDto, LocationDto } from '../../feature/location/data/location.dto';
+import { CreateLocationDto, LocationDto } from '../../../feature/location/data/location.dto';
 
 @Component({
   selector: 'app-location-dialog',

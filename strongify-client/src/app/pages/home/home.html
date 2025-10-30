@@ -15,19 +15,11 @@
           <div class="number">{{ user()!.workoutRecords.length || 0 }}</div>
           <div class="label">Workouts</div>
         </div>
-        <div class="stat">
-          <div class="number">0</div>
-          <div class="label">Streak</div>
-        </div>
-        <div class="stat">
-          <div class="number">0</div>
-          <div class="label">Points</div>
-        </div>
       </div>
 
       <div class="actions">
-        <button class="btn-primary">Start Workout</button>
-        <button class="btn-secondary">View Progress</button>
+        <button class="btn-primary" routerLink="/locations">Start Workout</button>
+        <button class="btn-secondary" routerLink="/records">View Records</button>
       </div>
     </main>
   </div>

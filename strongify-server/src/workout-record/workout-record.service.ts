@@ -19,7 +19,6 @@ export class WorkoutRecordService extends BaseService<WorkoutRecord> {
         super(repo);
     }
   
-  //! ovo ne valja, proveri
     async create(createWorkoutRecordDto: CreateWorkoutRecordDto & { user?: { id: number } }): Promise<WorkoutRecord> {
       const workoutRecord = this.repo.create(createWorkoutRecordDto as any);
       const saved = await this.repo.save(workoutRecord) as unknown as WorkoutRecord;

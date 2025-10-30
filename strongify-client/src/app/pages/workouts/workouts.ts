@@ -43,7 +43,7 @@ interface ChartData {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './workouts.html',
-  styleUrls: ['./workouts.scss'], // note plural
+  styleUrls: ['./workouts.scss'],
 })
 export class Workouts implements OnInit, AfterViewInit, OnDestroy {
   private locationService = inject(LocationService);

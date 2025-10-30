@@ -20,20 +20,20 @@ export class WebSocketService {
   connect() {
     // If already connected, do nothing
     if (this.socket?.connected) {
-      console.log('✅ WebSocket already connected');
+      console.log('WebSocket already connected');
       this.registerPendingListeners();
       return;
     }
 
     // If socket exists but not connected, try to reconnect
     if (this.socket && !this.socket.connected) {
-      console.log('🔄 Reconnecting existing socket...');
+      console.log('Reconnecting existing socket...');
       this.socket.connect();
       return;
     }
 
     try {
-      console.log('🔌 Attempting to connect to WebSocket:', environment.apiUrl);
+      console.log('Attempting to connect to WebSocket:', environment.apiUrl);
       this.socket = io(environment.apiUrl, {
         transports: ['websocket', 'polling'],
         reconnection: true,
@@ -42,28 +42,28 @@ export class WebSocketService {
       });
 
       this.socket.on('connect', () => {
-        console.log('✅ WebSocket connected, socket ID:', this.socket?.id);
+        console.log('WebSocket connected, socket ID:', this.socket?.id);
         this._connected$.next(true);
         this.registerPendingListeners();
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('❌ WebSocket connection error:', error);
+        console.error('WebSocket connection error:', error);
         this._connected$.next(false);
       });
 
       this.socket.on('disconnect', (reason) => {
-        console.warn('⚠️ WebSocket disconnected:', reason);
+        console.warn('WebSocket disconnected:', reason);
         this._connected$.next(false);
       });
     } catch (err) {
-      console.error('❌ Socket initialization failed:', err);
+      console.error('Socket initialization failed:', err);
     }
   }
 
   private registerPendingListeners() {
     if (this.pendingListeners.length > 0 && this.socket) {
-      console.log('📝 Registering', this.pendingListeners.length, 'pending event listeners');
+      console.log('Registering', this.pendingListeners.length, 'pending event listeners');
       this.pendingListeners.forEach(({ event, callback }) => {
         // Remove any existing listener first to avoid duplicates
         this.socket?.off(event, callback);
@@ -78,7 +78,7 @@ export class WebSocketService {
       this.socket.disconnect();
       this.socket = null;
       this._connected$.next(false);
-      console.log('🔌 WebSocket disconnected');
+      console.log('WebSocket disconnected');
     }
   }
 
@@ -97,10 +97,10 @@ export class WebSocketService {
 
     // If socket is already connected, register immediately
     if (this.socket?.connected) {
-      console.log('📝 Registering event listener for:', event);
+      console.log('Registering event listener for:', event);
       this.socket.on(event, callback);
     } else {
-      console.log('📝 Queueing event listener for:', event, '(socket not connected yet)');
+      console.log('Queueing event listener for:', event, '(socket not connected yet)');
     }
   }
 
@@ -122,7 +122,7 @@ export class WebSocketService {
 
   emit(event: string, data?: any): void {
     if (!this.socket) {
-      console.warn('⚠️ Socket not initialized, cannot emit event:', event);
+      console.warn('Socket not initialized, cannot emit event:', event);
       return;
     }
     this.socket.emit(event, data);

@@ -184,7 +184,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         <strong>${loc.name}</strong>
         <div class="desc">${loc.description ?? ''}</div>
   ${loc.imageUrl ? `<div class="img-wrap"><img src="${loc.imageUrl}" alt="${loc.name}" /></div>` : ''}
-        <div class="record">Top: <span data-loc-record>${recText}</span></div>
         <div class="actions">
           <button class="btn-primary set-record-btn" data-loc-id="${loc.id}">Set new record</button>
         </div>
@@ -218,7 +217,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   async openSetRecordDialog(locationId: string) {
     try {
-      const ref = this.dialog.open((await import('../../pages/home/set-record-dialog.component')).SetRecordDialogComponent, {
+      const ref = this.dialog.open((await import('../components/set-record-dialog/set-record-dialog.component')).SetRecordDialogComponent, {
         width: '480px',
         data: { locationId, exerciseTypes: this.exerciseTypes }
       });
@@ -289,7 +288,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   }
 
   async openAddLocationDialog() {
-    const ref = this.dialog.open((await import('../../pages/home/location-dialog.component')).LocationDialogComponent, { width: '560px' });
+    const ref = this.dialog.open((await import('../components/location-dialog/location-dialog.component')).LocationDialogComponent, { width: '560px' });
     const res = await firstValueFrom(ref.afterClosed());
     if (res && res.id && this.map) {
       const defaultIcon = this.createPinIcon();
